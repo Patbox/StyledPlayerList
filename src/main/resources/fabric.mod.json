@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "styledplayerlist",
+  "version": "${version}",
+
+  "name": "Styled Player List",
+  "description": "This mod allows server owners to change player list look!",
+  "authors": [
+    "Patbox"
+  ],
+  "contact": {
+    "homepage": "https://pb4.eu",
+    "sources": "https://github.com/Patbox/StyledPlayerList"
+  },
+
+  "license": "LGPLv3",
+
+  "environment": "server",
+  "entrypoints": {
+    "main": [
+      "eu.pb4.styledplayerlist.PlayerList"
+    ]
+  },
+  "mixins": [
+    "styledplayerlist.mixins.json"
+  ],
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric": "*",
+    "minecraft": "1.16.x"
+  }
+}
