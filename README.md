@@ -1,7 +1,7 @@
 # Styled Player List
 is a simple mod that allows server owners to style their player list as they like!
 
-If you hav any questions, you can ask thm on my [Discord](https://discord.com/invite/AbqPPppgrd)
+If you have any questions, you can ask them on my [Discord](https://discord.com/invite/AbqPPppgrd)
 
 ![Example image](https://i.imgur.com/hxZjOzY.png)
 
@@ -58,4 +58,6 @@ Formatting uses MiniMessage for which docs you can find [here](https://docs.adve
 - `<server_ram_used_mb>/<server_ram_used_gb>` - used amount of ram
 - `<server_tps>` - number of ticks per second
 - `<server_tps_colored>` - number of ticks per second with colors
+
+Additionally, this mod support [Fabric Placeholder API](https://github.com/Patbox/FabricPlaceholderAPI) with it's default formatting (`%modid:type%/%modid:type/data%`)
 

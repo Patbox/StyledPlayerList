@@ -1,6 +1,7 @@
 package eu.pb4.styledplayerlist.mixin;
 
 import com.mojang.authlib.GameProfile;
+import eu.pb4.styledplayerlist.Helper;
 import eu.pb4.styledplayerlist.PlayerList;
 import eu.pb4.styledplayerlist.access.SPEPlayerList;
 import eu.pb4.styledplayerlist.config.ConfigManager;
@@ -24,7 +25,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity implements SPEPlayerList {
@@ -77,13 +81,15 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements SP
 
                 PlayerListStyle style = ConfigManager.getStyle(this.activePlayerListStyle);
 
-                List<Template> templates = PlayerList.getTemplates((ServerPlayerEntity) (Object) this);
+                ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
 
-                Component header = PlayerList.miniMessage.parse(style.header, templates);
-                Component footer = PlayerList.miniMessage.parse(style.footer, templates);
+                List<Template> templates = Helper.getTemplates(player);
 
-                ((PlayerListHeaderS2CPacketAccessor) packet).setHeader(PlayerList.getAdventure().toNative(header));
-                ((PlayerListHeaderS2CPacketAccessor) packet).setFooter(PlayerList.getAdventure().toNative(footer));
+                Text header = Helper.parseMessageWithPlaceholders(style.header, new ArrayList<>(templates), player);
+                Text footer = Helper.parseMessageWithPlaceholders(style.footer, new ArrayList<>(templates), player);
+
+                ((PlayerListHeaderS2CPacketAccessor) packet).setHeader(header);
+                ((PlayerListHeaderS2CPacketAccessor) packet).setFooter(footer);
 
                 this.networkHandler.sendPacket(packet);
             }

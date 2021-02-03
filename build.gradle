@@ -5,6 +5,7 @@ plugins {
 
 repositories {
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+	maven { url 'https://jitpack.io' }
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -27,6 +28,8 @@ dependencies {
 	modImplementation include("net.kyori:adventure-platform-fabric:4.0.0-SNAPSHOT")
 	implementation include("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
 
+	modImplementation include("com.github.Patbox:FabricPlaceholderAPI:0.1.0")
+	modImplementation 'com.github.SuperCoder7979:databreaker:0.2.6'
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
 	// You may need to force-disable transitiveness on them.

@@ -4,6 +4,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.pb4.styledplayerlist.Helper;
 import eu.pb4.styledplayerlist.PlayerList;
 import eu.pb4.styledplayerlist.access.SPEPlayerList;
 import eu.pb4.styledplayerlist.config.ConfigManager;
@@ -63,7 +64,7 @@ public class Commands {
     }
 
     private static int about(CommandContext<ServerCommandSource> context) {
-        context.getSource().sendFeedback(PlayerList.parseMessage("<blue>Styled Player List</blue> - " + PlayerList.VERSION), false);
+        context.getSource().sendFeedback(Helper.parseMessage("<blue>Styled Player List</blue> - " + PlayerList.VERSION), false);
         return 1;
     }
 
@@ -71,7 +72,7 @@ public class Commands {
         ServerCommandSource source = context.getSource();
         String styleId = context.getArgument("style", String.class);
         if (!ConfigManager.styleExist(styleId)) {
-            source.sendFeedback(PlayerList.parseMessage(ConfigManager.getConfig().unknownStyleMessage), false);
+            source.sendFeedback(Helper.parseMessage(ConfigManager.getConfig().unknownStyleMessage), false);
             return 0;
         }
 
@@ -84,10 +85,10 @@ public class Commands {
 
                 ArrayList templates = new ArrayList();
                 templates.add(Template.of("style", style.name));
-                source.sendFeedback(PlayerList.parseMessage(ConfigManager.getConfig().switchMessage, templates), false);
+                source.sendFeedback(Helper.parseMessage(ConfigManager.getConfig().switchMessage, templates), false);
                 return 1;
             } else {
-                source.sendFeedback(PlayerList.parseMessage(ConfigManager.getConfig().permissionMessage), false);
+                source.sendFeedback(Helper.parseMessage(ConfigManager.getConfig().permissionMessage), false);
             }
         } else {
             source.sendFeedback(new LiteralText("Only players can use this command!"), false);
