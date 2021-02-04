@@ -5,11 +5,11 @@ import net.kyori.adventure.text.minimessage.Template;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 public class Helper {
+    public static Set<PlayerList.ModCompatibility> COMPATIBILITY = new HashSet<>();
+
     public static List<Template> getTemplates(ServerPlayerEntity player) {
         List<Template> templates = new ArrayList<>();
 
@@ -52,5 +52,17 @@ public class Helper {
     public static Text parseMessageWithPlaceholders(String minimessage, List<Template> templates, ServerPlayerEntity player) {
         Text text = PlayerList.getAdventure().toNative(PlayerList.miniMessage.parse(minimessage, templates));
         return PlaceholderAPI.parseText(text, player);
+    }
+
+
+    public static boolean shouldSendPlayerList(ServerPlayerEntity player) {
+        for (PlayerList.ModCompatibility mod : COMPATIBILITY) {
+            boolean value = mod.check(player);
+
+            if (value) {
+                return false;
+            }
+        }
+        return true;
     }
 }

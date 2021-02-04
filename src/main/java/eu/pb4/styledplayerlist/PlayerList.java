@@ -40,6 +40,7 @@ public class PlayerList implements ModInitializer {
 
 		ConfigManager.loadConfig();
 		Commands.register();
+		Compatibility.register();
 	}
 
 
@@ -64,6 +65,10 @@ public class PlayerList implements ModInitializer {
 	@FunctionalInterface
 	public interface PlayerListUpdate {
 		void onPlayerListUpdate(ServerPlayerEntity player, List<Template> templates);
+	}
+
+	public interface ModCompatibility {
+		boolean check(ServerPlayerEntity player);
 	}
 
 }

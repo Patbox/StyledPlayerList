@@ -74,14 +74,14 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements SP
 
     @Inject(method = "playerTick", at = @At("TAIL"))
     private void updatePlayerList(CallbackInfo ci) {
-        if (ConfigManager.isEnabled()) {
+        ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
+
+        if (ConfigManager.isEnabled() && Helper.shouldSendPlayerList(player)) {
             ConfigData config = ConfigManager.getConfig();
             if (this.activeListUpdateTicker % config.updateRate == 0) {
                 PlayerListHeaderS2CPacket packet = new PlayerListHeaderS2CPacket();
 
                 PlayerListStyle style = ConfigManager.getStyle(this.activePlayerListStyle);
-
-                ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
 
                 List<Template> templates = Helper.getTemplates(player);
 
