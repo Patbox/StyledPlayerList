@@ -22,7 +22,7 @@ You can find config file in `./config/styledplayerlist/`.
 ```
 ### Styles:
 This mod allows having multiple styles, that can be selected by players (just put them in `./config/styledplayerlist/styles/` and use `/styledplayerlist reload` command)
-Formatting uses MiniMessage for which docs you can find [here](https://docs.adventure.kyori.net/minimessage.html#format).
+[Formatting uses MiniMessage for which docs you can find here](https://docs.adventure.kyori.net/minimessage.html#format).
 
 ```json5
 {
@@ -32,14 +32,14 @@ Formatting uses MiniMessage for which docs you can find [here](https://docs.adve
     "",
     "<gradient:#4adeff:#3d8eff><bold> Styled Player List</bold></gradient> ⛏ ",
     "",
-    "<color:#555555><strikethrough>        </strikethrough>[ </color><color:#FF5555><server_online><color:#6666676>/</color><server_max_online></color><color:#555555> ]<strikethrough>        </strikethrough></color>",
+    "<color:#555555><strikethrough>        </strikethrough>[ </color><color:#FF5555>%server:online%<color:#6666676>/</color>%server:max_players%</color><color:#555555> ]<strikethrough>        </strikethrough></color>",
     ""
   ],
   "footer": [        // footer of player list, every element is in new line 
     "",
     "<color:#555555><strikethrough>                          </strikethrough></color>",
     "",
-    "<gray>TPS: <server_tps_colored> <dark_gray>|</dark_gray> <gray>Ping: <color:#ffba26><player_ping></color>",
+    "<gray>TPS: %server:tps_colored% <dark_gray>|</dark_gray> <gray>Ping: <color:#ffba26>%player:ping%</color>",
     ""
   ],
   "hidden": false,   // hides in commands
@@ -48,16 +48,5 @@ Formatting uses MiniMessage for which docs you can find [here](https://docs.adve
 ```
 
 ## Build in placeholders:
-### General:
-- `<player_name>` - player's name
-- `<player_display>` - player's display name
-- `<player_ping>` - player's ping
-- `<server_online>` - number of online players
-- `<server_max_online>` - maximal player count
-- `<server_ram_max_mb>/<server_ram_max_gb>` - maximal amount of ram server can use
-- `<server_ram_used_mb>/<server_ram_used_gb>` - used amount of ram
-- `<server_tps>` - number of ticks per second
-- `<server_tps_colored>` - number of ticks per second with colors
-
-Additionally, this mod support [Fabric Placeholder API](https://github.com/Patbox/FabricPlaceholderAPI) with it's default formatting (`%modid:type%/%modid:type/data%`)
+For supported placeholders list, see [Fabric Placeholder API's wiki](https://github.com/Patbox/FabricPlaceholderAPI/wiki)
 
