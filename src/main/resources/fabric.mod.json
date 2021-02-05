@@ -29,7 +29,7 @@
     "fabricloader": ">=0.7.4",
     "fabric": "*",
     "minecraft": "1.16.x",
-    "placeholder-api": "*",
+    "placeholder-api": ">=0.2.0",
     "adventure-platform-fabric": "4.0.*"
   }
 }

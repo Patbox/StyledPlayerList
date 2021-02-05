@@ -9,7 +9,8 @@ If you have any questions, you can ask them on my [Discord](https://discord.com/
 ## Commands (and permissions):
 - `/styledplayerlist` - Main command (`styledplayerlist.main`, available by default)
 - `/styledplayerlist reload` - Reloads configuration and styles (requires `styledplayerlist.reload`)
-- `/styledplayerlist switch <style>` or `/plstyle <style>` - Changes style (`styledplayerlist.switch`, available by default)
+- `/styledplayerlist switch <style>` or `/plstyle <style>` - Changes selected style (`styledplayerlist.switch`, available by default)
+- `/styledplayerlist switchothers <players> <style> ` - Changes selected style of players (`styledplayerlist.switch.others`)
 
 ## Configuration:
 You can find config file in `./config/styledplayerlist/`.

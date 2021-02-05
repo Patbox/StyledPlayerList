@@ -1,9 +1,11 @@
 package eu.pb4.styledplayerlist.command;
 
+
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.tree.LiteralCommandNode;
 import eu.pb4.styledplayerlist.Helper;
 import eu.pb4.styledplayerlist.PlayerList;
 import eu.pb4.styledplayerlist.access.SPEPlayerList;
@@ -11,14 +13,14 @@ import eu.pb4.styledplayerlist.config.ConfigManager;
 import eu.pb4.styledplayerlist.config.PlayerListStyle;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
-import net.kyori.adventure.text.minimessage.Template;
+import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.Formatting;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Locale;
 
 import static net.minecraft.server.command.CommandManager.literal;
@@ -26,7 +28,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class Commands {
     public static void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
-            dispatcher.register(
+            LiteralCommandNode node = dispatcher.register(
                     literal("styledplayerlist")
                             .requires(Permissions.require("styledplayerlist.main", true))
                             .executes(Commands::about)
@@ -36,6 +38,16 @@ public class Commands {
                                             .executes(Commands::switchStyle)
                                     )
                             )
+
+                            .then(literal("switchothers")
+                                    .requires(Permissions.require("styledplayerlist.switch.others", 2))
+                                    .then(CommandManager.argument("targets", EntityArgumentType.players())
+                                            .then(switchArgument("style")
+                                                    .executes(Commands::switchStyleOthers)
+                                            )
+                                    )
+                            )
+
                             .then(literal("reload")
                                     .requires(Permissions.require("styledplayerlist.reload", 3))
                                     .executes(Commands::reloadConfig)
@@ -68,9 +80,32 @@ public class Commands {
         return 1;
     }
 
-    public static int switchStyle(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    public static int switchStyleOthers(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
         ServerCommandSource source = context.getSource();
         String styleId = context.getArgument("style", String.class);
+        Collection<ServerPlayerEntity> target = EntityArgumentType.getPlayers(context, "targets");
+
+        if (!ConfigManager.styleExist(styleId)) {
+            source.sendFeedback(Helper.parseMessage(ConfigManager.getConfig().unknownStyleMessage), false);
+            return 0;
+        }
+
+        PlayerListStyle style = ConfigManager.getStyle(styleId);
+
+        for (ServerPlayerEntity player : target) {
+            ((SPEPlayerList) player).styledPlayerList$setPlayerListStyle(styleId);
+        }
+
+        source.sendFeedback(new LiteralText("Changed playerlist styles of targets to " + style.name), false);
+
+
+        return 2;
+    }
+
+    private static int switchStyle(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+        ServerCommandSource source = context.getSource();
+        String styleId = context.getArgument("style", String.class);
+
         if (!ConfigManager.styleExist(styleId)) {
             source.sendFeedback(Helper.parseMessage(ConfigManager.getConfig().unknownStyleMessage), false);
             return 0;
@@ -83,9 +118,8 @@ public class Commands {
             if (style.hasPermission(player)) {
                 ((SPEPlayerList) player).styledPlayerList$setPlayerListStyle(styleId);
 
-                ArrayList templates = new ArrayList();
-                templates.add(Template.of("style", style.name));
-                source.sendFeedback(Helper.parseMessage(ConfigManager.getConfig().switchMessage, templates), false);
+                String text = ConfigManager.getConfig().switchMessage.replaceAll("<style>", style.name);
+                source.sendFeedback(Helper.parseMessage(text), false);
                 return 1;
             } else {
                 source.sendFeedback(Helper.parseMessage(ConfigManager.getConfig().permissionMessage), false);
