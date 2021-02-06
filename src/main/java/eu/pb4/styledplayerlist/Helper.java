@@ -36,8 +36,6 @@ public class Helper {
             templates.add(Template.of("server_tps_colored", String.format("§c%.1f", tps)));
         }
 
-        PlayerList.PLAYER_LIST_UPDATE.invoker().onPlayerListUpdate(player, templates);
-
         return templates;
     }
 

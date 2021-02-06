@@ -26,9 +26,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Mixin(ServerPlayerEntity.class)
 public abstract class ServerPlayerEntityMixin extends PlayerEntity implements SPEPlayerList {
@@ -38,7 +36,7 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements SP
 
     @Shadow public abstract ServerWorld getServerWorld();
 
-    public String activePlayerListStyle = ConfigManager.getDefault();
+    private String activePlayerListStyle = ConfigManager.getDefault();
     private long activeListUpdateTicker = 0;
 
     @Inject(method = "readCustomDataFromTag", at = @At("TAIL"))
@@ -97,6 +95,10 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements SP
             this.activeListUpdateTicker += 1;
         }
     }
+    @Inject(method = "copyFrom", at = @At("TAIL"))
+    private void copyCustomData(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
+        this.activePlayerListStyle = ((SPEPlayerList) oldPlayer).styledPlayerList$getActivePlayerListStyle();
+    }
 
 
     @Override
@@ -111,6 +113,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements SP
             this.activePlayerListStyle = "default";
         }
     }
+
+
+    @Override
+    public String styledPlayerList$getActivePlayerListStyle() {
+        return this.activePlayerListStyle;
+    }
+
 
     public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);

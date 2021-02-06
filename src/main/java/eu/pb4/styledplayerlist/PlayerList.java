@@ -1,7 +1,9 @@
 package eu.pb4.styledplayerlist;
 
+import eu.pb4.styledplayerlist.access.SPEPlayerList;
 import eu.pb4.styledplayerlist.command.Commands;
 import eu.pb4.styledplayerlist.config.ConfigManager;
+import eu.pb4.styledplayerlist.config.PlayerListStyle;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
@@ -9,12 +11,11 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.kyori.adventure.platform.fabric.FabricServerAudiences;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.Template;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.List;
+import java.util.LinkedHashMap;
 
 public class PlayerList implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("Styled Player List");
@@ -49,22 +50,42 @@ public class PlayerList implements ModInitializer {
 	}
 
 
-	@Deprecated
-	public static final Event<PlayerList.PlayerListUpdate> PLAYER_LIST_UPDATE = EventFactory.createArrayBacked(PlayerList.PlayerListUpdate.class, (callbacks) -> (player, templates) -> {
-		PlayerListUpdate[] callbackArray = callbacks;
-		int length = callbacks.length;
-
-		for(int x = 0; x < length; ++length) {
-			PlayerListUpdate callback = callbackArray[x];
-			callback.onPlayerListUpdate(player, templates);
+	public static final Event<PlayerList.PlayerListStyleLoad> PLAYER_LIST_STYLE_LOAD = EventFactory.createArrayBacked(PlayerList.PlayerListStyleLoad.class, (callbacks) -> (styleHelper) -> {
+		for(PlayerListStyleLoad callback : callbacks ) {
+			callback.onPlayerListUpdate(styleHelper);
 		}
 
 	});
 
-	@Deprecated
 	@FunctionalInterface
-	public interface PlayerListUpdate {
-		void onPlayerListUpdate(ServerPlayerEntity player, List<Template> templates);
+	public interface PlayerListStyleLoad {
+		void onPlayerListUpdate(StyleHelper styleHelper);
+	}
+
+
+	public static class StyleHelper {
+		private final LinkedHashMap<String, PlayerListStyle> styles;
+
+		public StyleHelper(LinkedHashMap<String, PlayerListStyle> styles) {
+			this.styles = styles;
+		}
+
+		public void addStyle(PlayerListStyle style) {
+			this.styles.put(style.id, style);
+		}
+
+		public void removeStyle(PlayerListStyle style) {
+			this.styles.remove(style.id, style);
+		}
+	}
+
+
+	public static String getPlayersStyle(ServerPlayerEntity player) {
+		return ((SPEPlayerList) player).styledPlayerList$getActivePlayerListStyle();
+	}
+
+	public static void setPlayersStyle(ServerPlayerEntity player, String key) {
+		((SPEPlayerList) player).styledPlayerList$setPlayerListStyle(key);
 	}
 
 	public interface ModCompatibility {

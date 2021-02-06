@@ -66,6 +66,7 @@ public class ConfigManager {
                 STYLES.put(style.id, style);
             }
 
+            PlayerList.PLAYER_LIST_STYLE_LOAD.invoker().onPlayerListUpdate(new PlayerList.StyleHelper(STYLES));
 
             ENABLED = true;
         }
@@ -89,6 +90,6 @@ public class ConfigManager {
     public static Collection<PlayerListStyle> getStyles() { return STYLES.values(); }
 
     public static String getDefault() {
-        return ENABLED ? CONFIG.defaultStyle : "defauld";
+        return ENABLED ? CONFIG.defaultStyle : "default";
     }
 }
