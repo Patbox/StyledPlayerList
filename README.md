@@ -16,9 +16,13 @@ If you have any questions, you can ask them on my [Discord](https://discord.com/
 You can find config file in `./config/styledplayerlist/`.
 ```json5
 {
-  "defaultStyle": "default", // allows to select id of default player list
-  "updateRate": 20,          // change how often player list is updated (20 - 1 second)
-  "...Message": "..."        // allows to change messages
+  "defaultStyle": "default",                   // allows to select id of default player list
+  "updateRate": 20,                            // change how often player list is updated (20 = every 1 second)
+  "...Message": "...",                         // allows to change messages
+  "changePlayerName": false,                   // if true, names of players on player list will be changed
+  "playerNameFormat": "%player:display_name%", // format of player name (uses MiniMessage and placeholders)
+  "updatePlayerNameEveryChatMessage": false,   // if true, everytime player sends a message, theirs name will be updated 
+  "playerNameUpdateRate": -1                   // changes how often player name is updated (20 = every 1 second, -1 disables it)
 }
 ```
 ### Styles:

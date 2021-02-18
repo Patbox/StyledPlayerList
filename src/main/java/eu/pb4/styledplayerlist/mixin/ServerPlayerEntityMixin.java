@@ -13,6 +13,7 @@ import net.kyori.adventure.text.minimessage.Template;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket;
+import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
@@ -24,6 +25,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -92,12 +94,23 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements SP
                 this.networkHandler.sendPacket(packet);
             }
 
+            if (config.playerNameUpdateRate > 0 && this.activeListUpdateTicker % config.playerNameUpdateRate == 0) {
+                this.styledPlayerList$updatePlayerListName();
+            }
+
             this.activeListUpdateTicker += 1;
         }
     }
     @Inject(method = "copyFrom", at = @At("TAIL"))
     private void copyCustomData(ServerPlayerEntity oldPlayer, boolean alive, CallbackInfo ci) {
         this.activePlayerListStyle = ((SPEPlayerList) oldPlayer).styledPlayerList$getActivePlayerListStyle();
+    }
+
+    @Inject(method = "getPlayerListName", at = @At("HEAD"), cancellable = true)
+    private void changePlayerListName(CallbackInfoReturnable<Text> cir) {
+        if (ConfigManager.isEnabled() && ConfigManager.getConfig().changePlayerName) {
+            cir.setReturnValue(Helper.parseMessageWithPlaceholders(ConfigManager.getConfig().playerNameFormat, (ServerPlayerEntity) (Object) this));
+        }
     }
 
 
@@ -120,6 +133,13 @@ public abstract class ServerPlayerEntityMixin extends PlayerEntity implements SP
         return this.activePlayerListStyle;
     }
 
+    @Override
+    public void styledPlayerList$updatePlayerListName() {
+        if (ConfigManager.isEnabled() && ConfigManager.getConfig().changePlayerName) {
+            PlayerListS2CPacket packet = new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME, (ServerPlayerEntity) (Object) this);
+            this.getServer().getPlayerManager().sendToAll(packet);
+        }
+    }
 
     public ServerPlayerEntityMixin(World world, BlockPos pos, float yaw, GameProfile profile) {
         super(world, pos, yaw, profile);

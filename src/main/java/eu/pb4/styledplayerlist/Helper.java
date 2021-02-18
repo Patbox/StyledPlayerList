@@ -52,6 +52,10 @@ public class Helper {
         return PlaceholderAPI.parseText(text, player);
     }
 
+    public static Text parseMessageWithPlaceholders(String minimessage, ServerPlayerEntity player) {
+        Text text = PlayerList.getAdventure().toNative(PlayerList.miniMessage.parse(minimessage));
+        return PlaceholderAPI.parseText(text, player);
+    }
 
     public static boolean shouldSendPlayerList(ServerPlayerEntity player) {
         for (PlayerList.ModCompatibility mod : COMPATIBILITY) {
