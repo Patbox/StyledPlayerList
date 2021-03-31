@@ -38,7 +38,7 @@ public class ConfigManager {
             File configDir = Paths.get("", "config", "styledplayerlist").toFile();
 
             if (configStyle.mkdirs()) {
-                BufferedWriter writer = new BufferedWriter(new FileWriter(new File(configStyle, "default.json")));
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(configStyle, "default.json")), "UTF-8"));
                 writer.write(GSON.toJson(DefaultValues.exampleStyleData()));
                 writer.close();
             }
@@ -46,13 +46,14 @@ public class ConfigManager {
 
             File configFile = new File(configDir, "config.json");
 
+
             if (configFile.exists()) {
-                CONFIG = GSON.fromJson(new FileReader(configFile), ConfigData.class);
+                CONFIG = GSON.fromJson(new InputStreamReader(new FileInputStream(configFile), "UTF-8"), ConfigData.class);
             } else {
                 CONFIG = new ConfigData();
             }
 
-            BufferedWriter writer = new BufferedWriter(new FileWriter(configFile));
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8"));
             writer.write(GSON.toJson(CONFIG));
             writer.close();
 
@@ -61,7 +62,7 @@ public class ConfigManager {
             FilenameFilter filter = (dir, name) -> name.endsWith(".json");
 
             for (String fileName : configStyle.list(filter)) {
-                PlayerListStyle style = new PlayerListStyle(GSON.fromJson(new FileReader(new File(configStyle, fileName)), StyleData.class));
+                PlayerListStyle style = new PlayerListStyle(GSON.fromJson(new InputStreamReader(new FileInputStream(new File(configStyle, fileName)), "UTF-8"), StyleData.class));
 
                 STYLES.put(style.id, style);
             }
