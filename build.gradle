@@ -29,8 +29,8 @@ dependencies {
 	modImplementation include("net.kyori:adventure-platform-fabric:4.0.0-SNAPSHOT")
 	implementation include("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
 
-	//modImplementation include("com.github.Patbox:FabricPlaceholderAPI:0.2.1")
-	modImplementation include("eu.pb4:fabric-placeholder-api:0.3.0")
+	modImplementation include("com.github.Patbox:FabricPlaceholderAPI:0.3.0")
+	//modImplementation include("eu.pb4:fabric-placeholder-api:0.3.0")
 	modImplementation include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT")
 
 	modImplementation "com.github.SuperCoder7979:databreaker:0.2.6"
