@@ -7,10 +7,7 @@ import eu.pb4.styledplayerlist.config.PlayerListStyle;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.kyori.adventure.platform.fabric.FabricServerAudiences;
-import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,9 +18,7 @@ public class PlayerList implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("Styled Player List");
 	public static PlayerList INSTANCE;
 
-	public static final MiniMessage miniMessage = MiniMessage.get();
 	public static String VERSION = FabricLoader.getInstance().getModContainer("styledplayerlist").get().getMetadata().getVersion().getFriendlyString();
-	private FabricServerAudiences audiences;
 
 
 	public PlayerList() {
@@ -36,18 +31,12 @@ public class PlayerList implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ServerLifecycleEvents.SERVER_STARTING.register(server -> this.audiences = FabricServerAudiences.of(server));
-		ServerLifecycleEvents.SERVER_STOPPED.register(server -> this.audiences = null);
-
 		ConfigManager.loadConfig();
 		Commands.register();
 		Compatibility.register();
 	}
 
 
-	public static FabricServerAudiences getAdventure() {
-		return INSTANCE.audiences;
-	}
 
 
 	public static final Event<PlayerList.PlayerListStyleLoad> PLAYER_LIST_STYLE_LOAD = EventFactory.createArrayBacked(PlayerList.PlayerListStyleLoad.class, (callbacks) -> (styleHelper) -> {

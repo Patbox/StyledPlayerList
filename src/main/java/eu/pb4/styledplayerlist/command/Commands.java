@@ -76,7 +76,12 @@ public class Commands {
     }
 
     private static int about(CommandContext<ServerCommandSource> context) {
-        context.getSource().sendFeedback(Helper.parseMessage("<blue>Styled Player List</blue> - " + PlayerList.VERSION), false);
+        context.getSource().sendFeedback(new LiteralText("Styled Player List")
+                .formatted(Formatting.BLUE)
+                .append(new LiteralText( " - " + PlayerList.VERSION)
+                        .formatted(Formatting.WHITE)
+                ), false);
+
         return 1;
     }
 
@@ -86,7 +91,7 @@ public class Commands {
         Collection<ServerPlayerEntity> target = EntityArgumentType.getPlayers(context, "targets");
 
         if (!ConfigManager.styleExist(styleId)) {
-            source.sendFeedback(Helper.parseMessage(ConfigManager.getConfig().unknownStyleMessage), false);
+            source.sendFeedback(ConfigManager.getConfig().unknownStyleMessage, false);
             return 0;
         }
 
@@ -107,7 +112,7 @@ public class Commands {
         String styleId = context.getArgument("style", String.class);
 
         if (!ConfigManager.styleExist(styleId)) {
-            source.sendFeedback(Helper.parseMessage(ConfigManager.getConfig().unknownStyleMessage), false);
+            source.sendFeedback(ConfigManager.getConfig().unknownStyleMessage, false);
             return 0;
         }
 
@@ -118,11 +123,10 @@ public class Commands {
             if (style.hasPermission(player)) {
                 ((SPEPlayerList) player).styledPlayerList$setPlayerListStyle(styleId);
 
-                String text = ConfigManager.getConfig().switchMessage.replaceAll("<style>", style.name);
-                source.sendFeedback(Helper.parseMessage(text), false);
+                source.sendFeedback(ConfigManager.getConfig().getSwitchMessage(player, style.name), false);
                 return 1;
             } else {
-                source.sendFeedback(Helper.parseMessage(ConfigManager.getConfig().permissionMessage), false);
+                source.sendFeedback(ConfigManager.getConfig().permissionMessage, false);
             }
         } else {
             source.sendFeedback(new LiteralText("Only players can use this command!"), false);

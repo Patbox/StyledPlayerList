@@ -27,7 +27,7 @@ You can find config file in `./config/styledplayerlist/`.
 ```
 ### Styles:
 This mod allows having multiple styles, that can be selected by players (just put them in `./config/styledplayerlist/styles/` and use `/styledplayerlist reload` command)
-[Formatting uses MiniMessage for which docs you can find here](https://docs.adventure.kyori.net/minimessage.html#format).
+[Formatting uses PlaceholderAPI's Text Parser for which docs you can find here](https://github.com/Patbox/FabricPlaceholderAPI/blob/1.17/TEXT_FORMATTING.md).
 
 ```json5
 {

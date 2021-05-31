@@ -17,11 +17,11 @@ import java.util.LinkedHashMap;
 public class ConfigManager {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
-    private static ConfigData CONFIG;
+    private static Config CONFIG;
     private static boolean ENABLED = false;
     private static final LinkedHashMap<String, PlayerListStyle> STYLES = new LinkedHashMap<>();
 
-    public static ConfigData getConfig() {
+    public static Config getConfig() {
         return CONFIG;
     }
 
@@ -43,18 +43,19 @@ public class ConfigManager {
                 writer.close();
             }
 
+            ConfigData config;
 
             File configFile = new File(configDir, "config.json");
 
 
             if (configFile.exists()) {
-                CONFIG = GSON.fromJson(new InputStreamReader(new FileInputStream(configFile), "UTF-8"), ConfigData.class);
+                config = GSON.fromJson(new InputStreamReader(new FileInputStream(configFile), "UTF-8"), ConfigData.class);
             } else {
-                CONFIG = new ConfigData();
+                config = new ConfigData();
             }
 
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8"));
-            writer.write(GSON.toJson(CONFIG));
+            writer.write(GSON.toJson(config));
             writer.close();
 
             STYLES.clear();
@@ -68,7 +69,7 @@ public class ConfigManager {
             }
 
             PlayerList.PLAYER_LIST_STYLE_LOAD.invoker().onPlayerListUpdate(new PlayerList.StyleHelper(STYLES));
-
+            CONFIG = new Config(config);
             ENABLED = true;
         }
         catch(IOException exception) {
@@ -91,6 +92,6 @@ public class ConfigManager {
     public static Collection<PlayerListStyle> getStyles() { return STYLES.values(); }
 
     public static String getDefault() {
-        return ENABLED ? CONFIG.defaultStyle : "default";
+        return ENABLED ? CONFIG.configData.defaultStyle : "default";
     }
 }

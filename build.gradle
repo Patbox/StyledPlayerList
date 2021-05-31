@@ -1,17 +1,18 @@
 plugins {
-	id 'fabric-loom' version '0.5-SNAPSHOT'
+	id 'fabric-loom' version '0.8-SNAPSHOT'
 	id 'maven-publish'
 }
 
 repositories {
 	maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+	maven { url 'https://maven.nucleoid.xyz' }
 	maven { url 'https://jitpack.io' }
 	maven { url 'https://masa.dy.fi/maven' }
 	mavenLocal()
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
@@ -26,16 +27,13 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation include("net.kyori:adventure-platform-fabric:4.0.0-SNAPSHOT")
-	implementation include("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
-
-	modImplementation include("com.github.Patbox:FabricPlaceholderAPI:0.3.0")
+	modImplementation include("eu.pb4:placeholder-api:1.0.0-pre1-1.17-pre2")
 	//modImplementation include("eu.pb4:fabric-placeholder-api:0.3.0")
 	modImplementation include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT")
 
 	modImplementation "com.github.SuperCoder7979:databreaker:0.2.6"
 
-	modImplementation "carpet:fabric-carpet:${project.minecraft_version}-${project.carpet_core_version}"
+	modCompileOnly "carpet:fabric-carpet:${project.carpet_core_version}"
 
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
@@ -60,10 +58,7 @@ tasks.withType(JavaCompile).configureEach {
 	// The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
 	// JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
 	// We'll use that if it's available, but otherwise we'll use the older option.
-	def targetVersion = 8
-	if (JavaVersion.current().isJava9Compatible()) {
-		 it.options.release = targetVersion
-	}
+	it.options.release = 16
 }
 
 java {
