@@ -27,8 +27,7 @@ dependencies {
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-	modImplementation include("eu.pb4:placeholder-api:1.0.0-pre1-1.17-pre2")
-	//modImplementation include("eu.pb4:fabric-placeholder-api:0.3.0")
+	modImplementation include("eu.pb4:placeholder-api:1.0.0-rc1-1.17")
 	modImplementation include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT")
 
 	modImplementation "com.github.SuperCoder7979:databreaker:0.2.6"
