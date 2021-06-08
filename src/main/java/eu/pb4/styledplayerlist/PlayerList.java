@@ -7,6 +7,7 @@ import eu.pb4.styledplayerlist.config.PlayerListStyle;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.apache.logging.log4j.LogManager;
@@ -31,9 +32,9 @@ public class PlayerList implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		ConfigManager.loadConfig();
 		Commands.register();
 		Compatibility.register();
+		ServerLifecycleEvents.SERVER_STARTING.register((s) -> ConfigManager.loadConfig());
 	}
 
 
