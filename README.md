@@ -1,9 +1,16 @@
+![Logo](https://i.imgur.com/MV1mbYv.png)
+
 # Styled Player List
-is a simple mod that allows server owners to style their player list as they like!
+It's a simple mod that allows server owners to style their player list as they like!
+With full permission support, placeholder api support, multiple styles and player name overrides.
 
-If you have any questions, you can ask them on my [Discord](https://discord.com/invite/AbqPPppgrd)
+*This mod works only on Fabric Mod Loader and compatible!*
 
-![Example image](https://i.imgur.com/hxZjOzY.png)
+If you have any questions, you can ask them on my [Discord](https://pb4.eu/discord)
+
+[Also check out my other mods and project, as you might find them useful!](https://pb4.eu)
+
+![Example image](https://i.imgur.com/yIcm5dC.png)
 
 
 ## Commands (and permissions):
@@ -60,5 +67,5 @@ This mod allows having multiple styles, that can be selected by players (just pu
 ```
 
 ## Build in placeholders:
-For supported placeholders list, see [Fabric Placeholder API's wiki](https://github.com/Patbox/FabricPlaceholderAPI/wiki)
+For supported placeholders list, see [Placeholder API's wiki](https://placeholders.pb4.eu/user/general/)
 
