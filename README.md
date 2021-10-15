@@ -20,9 +20,16 @@ You can find config file in `./config/styledplayerlist/`.
   "updateRate": 20,                            // change how often player list is updated (20 = every 1 second)
   "...Message": "...",                         // allows to change messages
   "changePlayerName": false,                   // if true, names of players on player list will be changed
-  "playerNameFormat": "%player:display_name%", // format of player name (uses MiniMessage and placeholders)
+  "playerNameFormat": "%player:display_name%", // format of player name (uses Text Parser and placeholders)
   "updatePlayerNameEveryChatMessage": false,   // if true, everytime player sends a message, theirs name will be updated 
-  "playerNameUpdateRate": -1                   // changes how often player name is updated (20 = every 1 second, -1 disables it)
+  "playerNameUpdateRate": -1 ,                 // changes how often player name is updated (20 = every 1 second, -1 disables it)
+  "permissionNameFormat": [                    // Permission based overrides of name format
+    {
+      "permission": "some.permission",         // Required permission
+      "opLevel": -1,                           // Alternative OP level (-1 to disable)
+      "style": "..."                           // format of player name (uses Text Parser and placeholders)
+    }
+  ]
 }
 ```
 ### Styles:

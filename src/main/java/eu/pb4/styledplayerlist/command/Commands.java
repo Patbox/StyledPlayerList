@@ -6,9 +6,8 @@ import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
-import eu.pb4.styledplayerlist.Helper;
 import eu.pb4.styledplayerlist.PlayerList;
-import eu.pb4.styledplayerlist.access.SPEPlayerList;
+import eu.pb4.styledplayerlist.access.PlayerListViewerHolder;
 import eu.pb4.styledplayerlist.config.ConfigManager;
 import eu.pb4.styledplayerlist.config.PlayerListStyle;
 import me.lucko.fabric.api.permissions.v0.Permissions;
@@ -28,7 +27,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 public class Commands {
     public static void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
-            LiteralCommandNode node = dispatcher.register(
+            dispatcher.register(
                     literal("styledplayerlist")
                             .requires(Permissions.require("styledplayerlist.main", true))
                             .executes(Commands::about)
@@ -98,7 +97,7 @@ public class Commands {
         PlayerListStyle style = ConfigManager.getStyle(styleId);
 
         for (ServerPlayerEntity player : target) {
-            ((SPEPlayerList) player).styledPlayerList$setPlayerListStyle(styleId);
+            ((PlayerListViewerHolder) player.networkHandler).spl_setStyle(styleId);
         }
 
         source.sendFeedback(new LiteralText("Changed playerlist styles of targets to " + style.name), false);
@@ -121,7 +120,7 @@ public class Commands {
 
         if (player != null && player instanceof ServerPlayerEntity) {
             if (style.hasPermission(player)) {
-                ((SPEPlayerList) player).styledPlayerList$setPlayerListStyle(styleId);
+                ((PlayerListViewerHolder) player.networkHandler).spl_setStyle(styleId);
 
                 source.sendFeedback(ConfigManager.getConfig().getSwitchMessage(player, style.name), false);
                 return 1;

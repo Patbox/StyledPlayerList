@@ -7,13 +7,16 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import java.util.HashSet;
 import java.util.Set;
 
-public class Compatibility {
-    private static Set<ServerPlayerEntity> BLOCKED_LAST_TIME = new HashSet<>();
-    public static void register() {
+public class SPLHelper {
+    public static Set<PlayerList.ModCompatibility> COMPATIBILITY = new HashSet<>();
+
+    private static final Set<ServerPlayerEntity> BLOCKED_LAST_TIME = new HashSet<>();
+
+    static {
         FabricLoader loader = FabricLoader.getInstance();
 
         if (loader.getModContainer("carpet").isPresent()) {
-            Helper.COMPATIBILITY.add(player -> {
+            SPLHelper.COMPATIBILITY.add(player -> {
                 boolean block = HUDController.player_huds.containsKey(player);
                 boolean block2 = BLOCKED_LAST_TIME.contains(player);
 
@@ -26,5 +29,16 @@ public class Compatibility {
                 return block || block2;
             });
         }
+    }
+
+    public static boolean shouldSendPlayerList(ServerPlayerEntity player) {
+        for (PlayerList.ModCompatibility mod : COMPATIBILITY) {
+            boolean value = mod.check(player);
+
+            if (value) {
+                return false;
+            }
+        }
+        return true;
     }
 }

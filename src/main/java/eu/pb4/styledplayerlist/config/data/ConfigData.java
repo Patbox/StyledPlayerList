@@ -1,7 +1,7 @@
 package eu.pb4.styledplayerlist.config.data;
 
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ConfigData {
     public int CONFIG_VERSION_DONT_TOUCH_THIS = 1;
@@ -15,4 +15,11 @@ public class ConfigData {
     public String playerNameFormat = "%player:displayname%";
     public boolean updatePlayerNameEveryChatMessage = false;
     public long playerNameUpdateRate = -1;
+    public List<PermissionNameFormat> permissionNameFormat = new ArrayList<>();
+
+    public static class PermissionNameFormat {
+        public String permission = "";
+        public int opLevel = -1;
+        public String style = "";
+    }
 }
