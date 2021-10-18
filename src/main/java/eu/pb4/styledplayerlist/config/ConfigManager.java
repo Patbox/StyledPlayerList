@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 
 
 public class ConfigManager {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().setLenient().create();
 
     private static Config CONFIG;
     private static boolean ENABLED = false;
@@ -86,7 +86,7 @@ public class ConfigManager {
     }
 
     public static boolean styleExist(String key) {
-        return  STYLES.containsKey(key);
+        return STYLES.containsKey(key);
     }
 
     public static Collection<PlayerListStyle> getStyles() { return STYLES.values(); }

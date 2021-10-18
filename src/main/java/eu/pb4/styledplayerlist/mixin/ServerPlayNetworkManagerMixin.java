@@ -46,15 +46,14 @@ public abstract class ServerPlayNetworkManagerMixin implements PlayerListViewerH
             NbtString nickname = PlayerDataApi.getGlobalDataFor(player, id("style"), NbtString.TYPE);
 
             if (nickname != null) {
-                this.spl_setStyle(nickname.toString());
+                this.spl_setStyle(nickname.asString());
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         var old = ((SPEOldStyleData) player).spl_getOldStyle();
-
-        if (old != null) {
+        if (old != null && !old.isEmpty()) {
             this.spl_setStyle(old);
         }
     }
@@ -91,12 +90,14 @@ public abstract class ServerPlayNetworkManagerMixin implements PlayerListViewerH
         if (ConfigManager.isEnabled()) {
             if (ConfigManager.styleExist(key)) {
                 this.spl_activeStyle = key;
-                return;
+            } else {
+                this.spl_activeStyle = ConfigManager.getConfig().configData.defaultStyle;
             }
-            this.spl_activeStyle = ConfigManager.getConfig().configData.defaultStyle;
         } else {
             this.spl_activeStyle = "default";
         }
+
+        PlayerDataApi.setGlobalDataFor(this.player, id("style"), NbtString.of(this.spl_activeStyle));
     }
 
 

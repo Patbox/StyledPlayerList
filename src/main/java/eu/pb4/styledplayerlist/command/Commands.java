@@ -5,7 +5,6 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.tree.LiteralCommandNode;
 import eu.pb4.styledplayerlist.PlayerList;
 import eu.pb4.styledplayerlist.access.PlayerListViewerHolder;
 import eu.pb4.styledplayerlist.config.ConfigManager;
@@ -57,8 +56,8 @@ public class Commands {
                     literal("plstyle")
                             .requires(Permissions.require("styledplayerlist.switch", true))
                             .then(switchArgument("style")
-                            .executes(Commands::switchStyle)
-                    )
+                                    .executes(Commands::switchStyle)
+                            )
             );
 
         });
@@ -77,7 +76,7 @@ public class Commands {
     private static int about(CommandContext<ServerCommandSource> context) {
         context.getSource().sendFeedback(new LiteralText("Styled Player List")
                 .formatted(Formatting.BLUE)
-                .append(new LiteralText( " - " + PlayerList.VERSION)
+                .append(new LiteralText(" - " + PlayerList.VERSION)
                         .formatted(Formatting.WHITE)
                 ), false);
 
@@ -100,35 +99,39 @@ public class Commands {
             ((PlayerListViewerHolder) player.networkHandler).spl_setStyle(styleId);
         }
 
-        source.sendFeedback(new LiteralText("Changed playerlist styles of targets to " + style.name), false);
+        source.sendFeedback(new LiteralText("Changed player list style of targets to " + style.name), false);
 
 
         return 2;
     }
 
     private static int switchStyle(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerCommandSource source = context.getSource();
-        String styleId = context.getArgument("style", String.class);
+        try {
+            ServerCommandSource source = context.getSource();
+            String styleId = context.getArgument("style", String.class);
 
-        if (!ConfigManager.styleExist(styleId)) {
-            source.sendFeedback(ConfigManager.getConfig().unknownStyleMessage, false);
-            return 0;
-        }
-
-        PlayerListStyle style = ConfigManager.getStyle(styleId);
-        ServerPlayerEntity player = source.getPlayer();
-
-        if (player != null && player instanceof ServerPlayerEntity) {
-            if (style.hasPermission(player)) {
-                ((PlayerListViewerHolder) player.networkHandler).spl_setStyle(styleId);
-
-                source.sendFeedback(ConfigManager.getConfig().getSwitchMessage(player, style.name), false);
-                return 1;
-            } else {
-                source.sendFeedback(ConfigManager.getConfig().permissionMessage, false);
+            if (!ConfigManager.styleExist(styleId)) {
+                source.sendFeedback(ConfigManager.getConfig().unknownStyleMessage, false);
+                return 0;
             }
-        } else {
-            source.sendFeedback(new LiteralText("Only players can use this command!"), false);
+
+            PlayerListStyle style = ConfigManager.getStyle(styleId);
+            ServerPlayerEntity player = source.getPlayer();
+
+            if (player != null && player instanceof ServerPlayerEntity) {
+                if (style.hasPermission(player)) {
+                    ((PlayerListViewerHolder) player.networkHandler).spl_setStyle(styleId);
+
+                    source.sendFeedback(ConfigManager.getConfig().getSwitchMessage(player, style.name), false);
+                    return 1;
+                } else {
+                    source.sendFeedback(ConfigManager.getConfig().permissionMessage, false);
+                }
+            } else {
+                source.sendFeedback(new LiteralText("Only players can use this command!"), false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
         return 0;
