@@ -9,7 +9,7 @@ public class DefaultValues {
     public static StyleData exampleStyleData() {
         StyleData data = new StyleData();
         data.header.add("");
-        data.header.add("<gradient:#4adeff:#3d8eff><bold> Styled Player List</bold></gradient> ⛏ ");
+        data.header.add("<gr:#4adeff:#3d8eff><bold> Styled Player List</bold></gr> ⛏ ");
         data.header.add("");
         data.header.add("<color:#555555><strikethrough>        </strikethrough>[ </color><color:#FF5555>%server:online%<color:#6666676>/</color>%server:max_players%</color><color:#555555> ]<strikethrough>        </strikethrough></color>");
         data.header.add("");

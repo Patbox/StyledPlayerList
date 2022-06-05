@@ -3,17 +3,17 @@ package eu.pb4.styledplayerlist.mixin;
 import eu.pb4.playerdata.api.PlayerDataApi;
 import eu.pb4.styledplayerlist.SPLHelper;
 import eu.pb4.styledplayerlist.access.PlayerListViewerHolder;
-import eu.pb4.styledplayerlist.access.SPEOldStyleData;
 import eu.pb4.styledplayerlist.config.ConfigManager;
 import eu.pb4.styledplayerlist.config.PlayerListStyle;
 import eu.pb4.styledplayerlist.config.data.ConfigData;
 import net.minecraft.nbt.NbtString;
 import net.minecraft.network.ClientConnection;
 import net.minecraft.network.Packet;
+import net.minecraft.network.message.SignedMessage;
 import net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.filter.TextStream;
+import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Final;
@@ -51,11 +51,6 @@ public abstract class ServerPlayNetworkManagerMixin implements PlayerListViewerH
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        var old = ((SPEOldStyleData) player).spl_getOldStyle();
-        if (old != null && !old.isEmpty()) {
-            this.spl_setStyle(old);
-        }
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
@@ -77,8 +72,8 @@ public abstract class ServerPlayNetworkManagerMixin implements PlayerListViewerH
 
 
 
-    @Inject(method = "handleMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;broadcast(Lnet/minecraft/text/Text;Ljava/util/function/Function;Lnet/minecraft/network/MessageType;Ljava/util/UUID;)V"))
-    private void spl_onMessage(TextStream.Message message, CallbackInfo ci) {
+    @Inject(method = "handleDecoratedMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;checkForSpam()V"))
+    private void spl_onMessage(FilteredMessage<SignedMessage> message, CallbackInfo ci) {
         if (ConfigManager.isEnabled() && ConfigManager.getConfig().configData.updatePlayerNameEveryChatMessage) {
             this.spl_updateName();
         }

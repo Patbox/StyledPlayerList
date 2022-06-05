@@ -6,6 +6,7 @@ import eu.pb4.styledplayerlist.PlayerList;
 
 import eu.pb4.styledplayerlist.config.data.ConfigData;
 import eu.pb4.styledplayerlist.config.data.StyleData;
+import net.fabricmc.loader.api.FabricLoader;
 
 
 import java.io.*;
@@ -34,6 +35,7 @@ public class ConfigManager {
 
         CONFIG = null;
         try {
+
             File configStyle = Paths.get("", "config", "styledplayerlist", "styles").toFile();
             File configDir = Paths.get("", "config", "styledplayerlist").toFile();
 

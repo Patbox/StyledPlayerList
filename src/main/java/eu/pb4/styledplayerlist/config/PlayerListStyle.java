@@ -1,7 +1,9 @@
 package eu.pb4.styledplayerlist.config;
 
-import eu.pb4.placeholders.PlaceholderAPI;
-import eu.pb4.placeholders.TextParser;
+import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.TextParserUtils;
+import eu.pb4.placeholders.api.node.TextNode;
 import eu.pb4.styledplayerlist.config.data.StyleData;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.minecraft.server.command.ServerCommandSource;
@@ -12,8 +14,8 @@ public class PlayerListStyle {
     public final String id;
     public final String name;
 
-    public final Text header;
-    public final Text footer;
+    public final TextNode header;
+    public final TextNode footer;
 
     public final Boolean hidden;
     private final String permission;
@@ -22,8 +24,8 @@ public class PlayerListStyle {
     public PlayerListStyle(StyleData data) {
         this.id = data.id;
         this.name = data.name;
-        this.header = TextParser.parse(String.join("\n", data.header));
-        this.footer = TextParser.parse(String.join("\n", data.footer));
+        this.header = Placeholders.parseNodes(TextParserUtils.formatNodes(String.join("\n", data.header)));
+        this.footer = Placeholders.parseNodes(TextParserUtils.formatNodes(String.join("\n", data.footer)));
         this.hidden = data.hidden;
         this.permission = data.permission;
     }
@@ -45,10 +47,10 @@ public class PlayerListStyle {
     }
 
     public Text getHeader(ServerPlayerEntity player) {
-        return PlaceholderAPI.parseText(this.header, player);
+        return this.header.toText(PlaceholderContext.of(player).asParserContext(), true);
     }
 
     public Text getFooter(ServerPlayerEntity player) {
-        return PlaceholderAPI.parseText(this.footer, player);
+        return this.footer.toText(PlaceholderContext.of(player).asParserContext(), true);
     }
 }

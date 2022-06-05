@@ -15,7 +15,7 @@
 
   "license": "LGPLv3",
 
-  "environment": "server",
+  "environment": "*",
   "entrypoints": {
     "main": [
       "eu.pb4.styledplayerlist.PlayerList"

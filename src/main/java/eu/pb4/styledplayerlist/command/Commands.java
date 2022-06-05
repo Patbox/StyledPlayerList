@@ -10,12 +10,12 @@ import eu.pb4.styledplayerlist.access.PlayerListViewerHolder;
 import eu.pb4.styledplayerlist.config.ConfigManager;
 import eu.pb4.styledplayerlist.config.PlayerListStyle;
 import me.lucko.fabric.api.permissions.v0.Permissions;
-import net.fabricmc.fabric.api.command.v1.CommandRegistrationCallback;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 
 import java.util.Collection;
@@ -25,7 +25,7 @@ import static net.minecraft.server.command.CommandManager.literal;
 
 public class Commands {
     public static void register() {
-        CommandRegistrationCallback.EVENT.register((dispatcher, dedicated) -> {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             dispatcher.register(
                     literal("styledplayerlist")
                             .requires(Permissions.require("styledplayerlist.main", true))
@@ -65,18 +65,18 @@ public class Commands {
 
     private static int reloadConfig(CommandContext<ServerCommandSource> context) {
         if (ConfigManager.loadConfig()) {
-            context.getSource().sendFeedback(new LiteralText("Reloaded config!"), false);
+            context.getSource().sendFeedback(Text.literal("Reloaded config!"), false);
         } else {
-            context.getSource().sendError(new LiteralText("Error accrued while reloading config!").formatted(Formatting.RED));
+            context.getSource().sendError(Text.literal("Error accrued while reloading config!").formatted(Formatting.RED));
 
         }
         return 1;
     }
 
     private static int about(CommandContext<ServerCommandSource> context) {
-        context.getSource().sendFeedback(new LiteralText("Styled Player List")
+        context.getSource().sendFeedback(Text.literal("Styled Player List")
                 .formatted(Formatting.BLUE)
-                .append(new LiteralText(" - " + PlayerList.VERSION)
+                .append(Text.literal(" - " + PlayerList.VERSION)
                         .formatted(Formatting.WHITE)
                 ), false);
 
@@ -99,7 +99,7 @@ public class Commands {
             ((PlayerListViewerHolder) player.networkHandler).spl_setStyle(styleId);
         }
 
-        source.sendFeedback(new LiteralText("Changed player list style of targets to " + style.name), false);
+        source.sendFeedback(Text.literal("Changed player list style of targets to " + style.name), false);
 
 
         return 2;
@@ -128,7 +128,7 @@ public class Commands {
                     source.sendFeedback(ConfigManager.getConfig().permissionMessage, false);
                 }
             } else {
-                source.sendFeedback(new LiteralText("Only players can use this command!"), false);
+                source.sendFeedback(Text.literal("Only players can use this command!"), false);
             }
         } catch (Exception e) {
             e.printStackTrace();
