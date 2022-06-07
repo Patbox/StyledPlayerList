@@ -8,6 +8,7 @@ public class ConfigData {
     public String _comment = "Before changing anything, see https://github.com/Patbox/StyledPlayerList#configuration";
     public String defaultStyle = "default";
     public long updateRate = 20;
+    public boolean displayOnSingleplayer = true;
     public String switchMessage = "Your player list style has been changed to: <gold>${style}</gold>";
     public String unknownStyleMessage = "<red>This style doesn't exist!</red>";
     public String permissionMessage = "<red>You don't have required permissions!</red>";
