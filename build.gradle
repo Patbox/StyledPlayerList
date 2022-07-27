@@ -32,8 +32,8 @@ dependencies {
 	modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 	modLocalRuntime("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
-	modImplementation include("eu.pb4:placeholder-api:2.0.0-beta.3+1.19")
-	modImplementation include("eu.pb4:player-data-api:0.1.0+1.18")
+	modImplementation include("eu.pb4:placeholder-api:2.0.0-beta.7+1.19")
+	modImplementation include("eu.pb4:player-data-api:0.2.1+1.19")
 	modImplementation include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT")
 
 	modCompileOnly "carpet:fabric-carpet:${project.carpet_core_version}"
@@ -103,12 +103,13 @@ curseforge {
 		apiKey = System.getenv("CURSEFORGE")
 
 		project {
-			id = "551890"
+			id = "442282"
 			releaseType = "release"
 			changelog = System.getenv("CHANGELOG")
 			changelogType = "markdown"
-			addGameVersion "1.18.2"
+			addGameVersion ((String) project.minecraft_version)
 			addGameVersion "Fabric"
+			addGameVersion "Quilt"
 			mainArtifact(remapJar)
 
 			afterEvaluate {
@@ -128,7 +129,7 @@ curseforge {
 if (System.getenv("MODRINTH")) {
 	modrinth {
 		token = System.getenv("MODRINTH")
-		projectId = 'xGdtZczs'// The ID of your modrinth project, slugs will not work.
+		projectId = 'DQIfKUHf'// The ID of your modrinth project, slugs will not work.
 		versionNumber = "" + version // The version of the mod to upload.
 		versionType = isStable ? "release" : "beta"
 		uploadFile = remapJar // This links to a task that builds your mod jar and sets "uploadFile" to the mod jar.

@@ -73,7 +73,7 @@ public abstract class ServerPlayNetworkManagerMixin implements PlayerListViewerH
 
 
     @Inject(method = "handleDecoratedMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;checkForSpam()V"))
-    private void spl_onMessage(FilteredMessage<SignedMessage> message, CallbackInfo ci) {
+    private void spl_onMessage(SignedMessage signedMessage, CallbackInfo ci) {
         if (ConfigManager.isEnabled() && ConfigManager.getConfig().configData.updatePlayerNameEveryChatMessage) {
             this.spl_updateName();
         }
