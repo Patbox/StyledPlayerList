@@ -32,8 +32,8 @@ dependencies {
 	modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 	modLocalRuntime("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
-	modImplementation include("eu.pb4:placeholder-api:2.0.0-beta.7+1.19")
-	modImplementation include("eu.pb4:player-data-api:0.2.1+1.19")
+	modImplementation include("eu.pb4:placeholder-api:2.0.0-rc.2+1.19.3")
+	modImplementation include("eu.pb4:player-data-api:0.2.2+1.19.3")
 	modImplementation include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT")
 
 	modCompileOnly "carpet:fabric-carpet:${project.carpet_core_version}"
@@ -107,7 +107,7 @@ curseforge {
 			releaseType = "release"
 			changelog = System.getenv("CHANGELOG")
 			changelogType = "markdown"
-			addGameVersion ((String) project.minecraft_version)
+			addGameVersion ((String) project.minecraft_version.split('-')[0])
 			addGameVersion "Fabric"
 			addGameVersion "Quilt"
 			mainArtifact(remapJar)

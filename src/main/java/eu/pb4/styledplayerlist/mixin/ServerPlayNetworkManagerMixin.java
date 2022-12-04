@@ -13,7 +13,6 @@ import net.minecraft.network.message.SignedMessage;
 import net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.filter.FilteredMessage;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Final;
@@ -34,19 +33,20 @@ public abstract class ServerPlayNetworkManagerMixin implements PlayerListViewerH
     @Shadow public abstract void sendPacket(Packet<?> packet);
 
     @Shadow @Final private MinecraftServer server;
-    @Unique
-    private String spl_activeStyle = ConfigManager.getDefault();
 
     @Unique
-    private long spl_ticker = 0;
+    private String styledPlayerList$activeStyle = ConfigManager.getDefault();
+
+    @Unique
+    private long styledPlayerList$ticker = 0;
 
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void loadData(MinecraftServer server, ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
+    private void styledPlayerList$loadData(MinecraftServer server, ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
         try {
             NbtString nickname = PlayerDataApi.getGlobalDataFor(player, id("style"), NbtString.TYPE);
 
             if (nickname != null) {
-                this.spl_setStyle(nickname.asString());
+                this.styledPlayerList$setStyle(nickname.asString());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -54,55 +54,55 @@ public abstract class ServerPlayNetworkManagerMixin implements PlayerListViewerH
     }
 
     @Inject(method = "tick", at = @At("TAIL"))
-    private void updatePlayerList(CallbackInfo ci) {
+    private void styledPlayerList$updatePlayerList(CallbackInfo ci) {
         if (ConfigManager.isEnabled() && SPLHelper.shouldSendPlayerList(this.player)) {
             ConfigData config = ConfigManager.getConfig().configData;
-            if (this.spl_ticker % config.updateRate == 0) {
-                PlayerListStyle style = ConfigManager.getStyle(this.spl_activeStyle);
+            if (this.styledPlayerList$ticker % config.updateRate == 0) {
+                PlayerListStyle style = ConfigManager.getStyle(this.styledPlayerList$activeStyle);
                 this.sendPacket(new PlayerListHeaderS2CPacket(style.getHeader(this.player), style.getFooter(this.player)));
             }
 
-            if (config.playerNameUpdateRate > 0 && this.spl_ticker % config.playerNameUpdateRate == 0) {
-                this.spl_updateName();
+            if (config.playerNameUpdateRate > 0 && this.styledPlayerList$ticker % config.playerNameUpdateRate == 0) {
+                this.styledPlayerList$updateName();
             }
 
-            this.spl_ticker += 1;
+            this.styledPlayerList$ticker += 1;
         }
     }
 
 
 
     @Inject(method = "handleDecoratedMessage", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayNetworkHandler;checkForSpam()V"))
-    private void spl_onMessage(SignedMessage signedMessage, CallbackInfo ci) {
+    private void styledPlayerList$onMessage(SignedMessage signedMessage, CallbackInfo ci) {
         if (ConfigManager.isEnabled() && ConfigManager.getConfig().configData.updatePlayerNameEveryChatMessage) {
-            this.spl_updateName();
+            this.styledPlayerList$updateName();
         }
     }
 
 
     @Override
-    public void spl_setStyle(String key) {
+    public void styledPlayerList$setStyle(String key) {
         if (ConfigManager.isEnabled()) {
             if (ConfigManager.styleExist(key)) {
-                this.spl_activeStyle = key;
+                this.styledPlayerList$activeStyle = key;
             } else {
-                this.spl_activeStyle = ConfigManager.getConfig().configData.defaultStyle;
+                this.styledPlayerList$activeStyle = ConfigManager.getConfig().configData.defaultStyle;
             }
         } else {
-            this.spl_activeStyle = "default";
+            this.styledPlayerList$activeStyle = "default";
         }
 
-        PlayerDataApi.setGlobalDataFor(this.player, id("style"), NbtString.of(this.spl_activeStyle));
+        PlayerDataApi.setGlobalDataFor(this.player, id("style"), NbtString.of(this.styledPlayerList$activeStyle));
     }
 
 
     @Override
-    public String spl_getStyle() {
-        return this.spl_activeStyle;
+    public String styledPlayerList$getStyle() {
+        return this.styledPlayerList$activeStyle;
     }
 
     @Override
-    public void spl_updateName() {
+    public void styledPlayerList$updateName() {
         try {
             if (ConfigManager.isEnabled() && ConfigManager.getConfig().configData.changePlayerName) {
                 PlayerListS2CPacket packet = new PlayerListS2CPacket(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME, this.player);

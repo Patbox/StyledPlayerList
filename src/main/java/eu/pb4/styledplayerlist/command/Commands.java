@@ -96,7 +96,7 @@ public class Commands {
         PlayerListStyle style = ConfigManager.getStyle(styleId);
 
         for (ServerPlayerEntity player : target) {
-            ((PlayerListViewerHolder) player.networkHandler).spl_setStyle(styleId);
+            ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$setStyle(styleId);
         }
 
         source.sendFeedback(Text.literal("Changed player list style of targets to " + style.name), false);
@@ -120,7 +120,7 @@ public class Commands {
 
             if (player != null && player instanceof ServerPlayerEntity) {
                 if (style.hasPermission(player)) {
-                    ((PlayerListViewerHolder) player.networkHandler).spl_setStyle(styleId);
+                    ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$setStyle(styleId);
 
                     source.sendFeedback(ConfigManager.getConfig().getSwitchMessage(player, style.name), false);
                     return 1;

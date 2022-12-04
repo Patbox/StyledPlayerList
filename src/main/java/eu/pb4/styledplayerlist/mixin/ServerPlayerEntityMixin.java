@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(ServerPlayerEntity.class)
 public class ServerPlayerEntityMixin {
     @Inject(method = "getPlayerListName", at = @At("HEAD"), cancellable = true)
-    private void spl_changePlayerListName(CallbackInfoReturnable<Text> cir) {
+    private void styledPlayerList$changePlayerListName(CallbackInfoReturnable<Text> cir) {
         try {
             if (ConfigManager.isEnabled() && ConfigManager.getConfig().configData.changePlayerName) {
                 cir.setReturnValue(ConfigManager.getConfig().formatPlayerUsername((ServerPlayerEntity) (Object) this));

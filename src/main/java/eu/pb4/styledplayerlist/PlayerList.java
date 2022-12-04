@@ -61,11 +61,11 @@ public class PlayerList implements ModInitializer {
 
 
 	public static String getPlayersStyle(ServerPlayerEntity player) {
-		return ((PlayerListViewerHolder) player.networkHandler).spl_getStyle();
+		return ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$getStyle();
 	}
 
 	public static void setPlayersStyle(ServerPlayerEntity player, String key) {
-		((PlayerListViewerHolder) player).spl_setStyle(key);
+		((PlayerListViewerHolder) player).styledPlayerList$setStyle(key);
 	}
 
 	public static void addUpdateSkipCheck(ModCompatibility check) {

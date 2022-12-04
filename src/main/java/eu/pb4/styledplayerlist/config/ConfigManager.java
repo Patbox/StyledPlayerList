@@ -73,8 +73,7 @@ public class ConfigManager {
             PlayerList.PLAYER_LIST_STYLE_LOAD.invoker().onPlayerListUpdate(new PlayerList.StyleHelper(STYLES));
             CONFIG = new Config(config);
             ENABLED = true;
-        }
-        catch(IOException exception) {
+        } catch(Throwable exception) {
             ENABLED = false;
             PlayerList.LOGGER.error("Something went wrong while reading config!");
             exception.printStackTrace();
