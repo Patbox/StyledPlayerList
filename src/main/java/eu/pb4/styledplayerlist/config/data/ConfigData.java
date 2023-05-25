@@ -1,26 +1,62 @@
 package eu.pb4.styledplayerlist.config.data;
 
+import com.google.gson.annotations.SerializedName;
+import eu.pb4.predicate.api.MinecraftPredicate;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ConfigData {
-    public int CONFIG_VERSION_DONT_TOUCH_THIS = 1;
+    @SerializedName("config_version")
+    public int version = 2;
+    @SerializedName("__comment")
     public String _comment = "Before changing anything, see https://github.com/Patbox/StyledPlayerList#configuration";
+    @SerializedName("default_style")
     public String defaultStyle = "default";
-    public long updateRate = 20;
+    @SerializedName("messages")
+    public Messages messages = new Messages();
+    @SerializedName("player")
+    public PlayerName playerName = new PlayerName();
+
+    @SerializedName("client_show_in_singleplayer")
     public boolean displayOnSingleplayer = true;
-    public String switchMessage = "Your player list style has been changed to: <gold>${style}</gold>";
-    public String unknownStyleMessage = "<red>This style doesn't exist!</red>";
-    public String permissionMessage = "<red>You don't have required permissions!</red>";
-    public boolean changePlayerName = false;
-    public String playerNameFormat = "%player:displayname%";
-    public boolean updatePlayerNameEveryChatMessage = false;
-    public long playerNameUpdateRate = -1;
-    public List<PermissionNameFormat> permissionNameFormat = new ArrayList<>();
+
+    public static class Messages {
+        @SerializedName("switch")
+        public String switchMessage = "Your player list style has been changed to: <gold>${style}</gold>";
+        @SerializedName("unknown")
+        public String unknownStyleMessage = "<red>This style doesn't exist!</red>";
+        @SerializedName("no_permission")
+        public String permissionMessage = "<red>You don't have required permissions!</red>";
+    }
+
+    public static class PlayerName {
+        @SerializedName("modify_name")
+        public boolean changePlayerName = false;
+        @SerializedName("passthrough")
+        public boolean ignoreFormatting = false;
+        @SerializedName("hidden")
+        public boolean hidePlayer = false;
+        @SerializedName("format")
+        public String playerNameFormat = "%player:displayname%";
+        @SerializedName("update_on_chat_message")
+        public boolean updatePlayerNameEveryChatMessage = false;
+        @SerializedName("update_tick_time")
+        public long playerNameUpdateRate = -1;
+        @SerializedName("styles")
+        public List<PermissionNameFormat> permissionNameFormat = new ArrayList<>();
+
+    }
 
     public static class PermissionNameFormat {
-        public String permission = "";
-        public int opLevel = -1;
-        public String style = "";
+        @SerializedName("require")
+        public MinecraftPredicate require;
+        @SerializedName("format")
+        public String format = "";
+        @SerializedName("passthrough")
+        public boolean ignoreFormatting = false;
+        @SerializedName("hidden")
+        public Boolean hidePlayer;
+
     }
 }

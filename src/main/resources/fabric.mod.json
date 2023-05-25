@@ -12,20 +12,22 @@
     "homepage": "https://pb4.eu",
     "sources": "https://github.com/Patbox/StyledPlayerList"
   },
-
+  "icon": "assets/styled_player_list/logo.png",
   "license": "LGPLv3",
 
   "environment": "*",
   "entrypoints": {
     "main": [
       "eu.pb4.styledplayerlist.PlayerList"
+    ],
+    "preLaunch": [
+      "eu.pb4.styledplayerlist.CardboardWarning"
     ]
   },
   "mixins": [
     "styledplayerlist.mixins.json"
   ],
-
   "depends": {
-    "minecraft": ">=1.19.2"
+    "minecraft": ">=1.19.4"
   }
 }

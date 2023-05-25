@@ -13,7 +13,7 @@ public class ServerPlayerEntityMixin {
     @Inject(method = "getPlayerListName", at = @At("HEAD"), cancellable = true)
     private void styledPlayerList$changePlayerListName(CallbackInfoReturnable<Text> cir) {
         try {
-            if (ConfigManager.isEnabled() && ConfigManager.getConfig().configData.changePlayerName) {
+            if (ConfigManager.isEnabled() && ConfigManager.getConfig().configData.playerName.changePlayerName) {
                 cir.setReturnValue(ConfigManager.getConfig().formatPlayerUsername((ServerPlayerEntity) (Object) this));
             }
         } catch (Exception e) {

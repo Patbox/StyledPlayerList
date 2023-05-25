@@ -5,7 +5,7 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import eu.pb4.styledplayerlist.PlayerList;
+import eu.pb4.styledplayerlist.GenericModInfo;
 import eu.pb4.styledplayerlist.access.PlayerListViewerHolder;
 import eu.pb4.styledplayerlist.config.ConfigManager;
 import eu.pb4.styledplayerlist.config.PlayerListStyle;
@@ -68,17 +68,18 @@ public class Commands {
             context.getSource().sendFeedback(Text.literal("Reloaded config!"), false);
         } else {
             context.getSource().sendError(Text.literal("Error accrued while reloading config!").formatted(Formatting.RED));
-
         }
+        for (var player : context.getSource().getServer().getPlayerManager().getPlayerList()) {
+            ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$reloadStyle();
+        }
+
         return 1;
     }
 
     private static int about(CommandContext<ServerCommandSource> context) {
-        context.getSource().sendFeedback(Text.literal("Styled Player List")
-                .formatted(Formatting.BLUE)
-                .append(Text.literal(" - " + PlayerList.VERSION)
-                        .formatted(Formatting.WHITE)
-                ), false);
+        for (var text : (context.getSource().getEntity() instanceof ServerPlayerEntity ? GenericModInfo.getAboutFull() : GenericModInfo.getAboutConsole())) {
+            context.getSource().sendFeedback(text, false);
+        };
 
         return 1;
     }

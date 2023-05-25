@@ -1,15 +1,20 @@
 package eu.pb4.styledplayerlist;
 
+import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.styledplayerlist.access.PlayerListViewerHolder;
 import eu.pb4.styledplayerlist.command.Commands;
 import eu.pb4.styledplayerlist.config.ConfigManager;
 import eu.pb4.styledplayerlist.config.PlayerListStyle;
+import eu.pb4.styledplayerlist.config.data.ConfigData;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,16 +25,45 @@ public class PlayerList implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("Styled Player List");
 	public static final String ID = "styledplayerlist";
 
-	public static String VERSION = FabricLoader.getInstance().getModContainer(ID).get().getMetadata().getVersion().getFriendlyString();
-
 	@Override
 	public void onInitialize() {
-		this.crabboardDetection();
+		GenericModInfo.build(FabricLoader.getInstance().getModContainer(ID).get());
 		Commands.register();
 		ServerLifecycleEvents.SERVER_STARTING.register((s) -> {
-			this.crabboardDetection();
 			ConfigManager.loadConfig();
 		});
+
+		ServerLifecycleEvents.SERVER_STARTED.register(s -> {
+			CardboardWarning.checkAndAnnounce();
+			//MicroScheduler.get(s).scheduleRepeating(50, () -> tick(s));
+		});
+	}
+
+	private void tick(MinecraftServer server) {
+		if (ConfigManager.isEnabled()) {
+			ConfigData config = ConfigManager.getConfig().configData;
+			for (var player : server.getPlayerManager().getPlayerList()) {
+				var x = System.nanoTime();
+				if (!SPLHelper.shouldSendPlayerList(player) || player.networkHandler == null) {
+					continue;
+				}
+				var tick = server.getTicks();
+				var holder = (PlayerListViewerHolder) player.networkHandler;
+
+				var style = holder.styledPlayerList$getStyleObject();
+
+				if (tick % style.updateRate == 0) {
+					var context = PlaceholderContext.of(player, SPLHelper.PLAYER_LIST_VIEW);
+					var animationTick = holder.styledPlayerList$getAndIncreaseAnimationTick();
+					player.networkHandler.sendPacket(new PlayerListHeaderS2CPacket(style.getHeader(context, animationTick), style.getFooter(context, animationTick)));
+				}
+
+				if (config.playerName.playerNameUpdateRate > 0 && tick % config.playerName.playerNameUpdateRate == 0) {
+					holder.styledPlayerList$updateName();
+				}
+				player.sendMessage(Text.literal(tick + " | " + ((System.nanoTime() - x) / 1000000f)), true);
+			}
+		}
 	}
 
 	public static Identifier id(String path) {
@@ -74,16 +108,5 @@ public class PlayerList implements ModInitializer {
 
 	public interface ModCompatibility {
 		boolean check(ServerPlayerEntity player);
-	}
-
-	private void crabboardDetection() {
-		if (FabricLoader.getInstance().isModLoaded("cardboard")) {
-			LOGGER.error("");
-			LOGGER.error("Cardboard detected! This mod doesn't work with it!");
-			LOGGER.error("You won't get any support as long as it's present!");
-			LOGGER.error("");
-			LOGGER.error("Read more: https://gist.github.com/Patbox/e44844294c358b614d347d369b0fc3bf");
-			LOGGER.error("");
-		}
 	}
 }

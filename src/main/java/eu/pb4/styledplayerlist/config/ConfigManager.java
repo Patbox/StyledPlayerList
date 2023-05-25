@@ -2,21 +2,29 @@ package eu.pb4.styledplayerlist.config;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParser;
+import eu.pb4.predicate.api.GsonPredicateSerializer;
+import eu.pb4.predicate.api.MinecraftPredicate;
 import eu.pb4.styledplayerlist.PlayerList;
 
 import eu.pb4.styledplayerlist.config.data.ConfigData;
 import eu.pb4.styledplayerlist.config.data.StyleData;
+import eu.pb4.styledplayerlist.config.data.legacy.LegacyConfigData;
+import eu.pb4.styledplayerlist.config.data.legacy.LegacyStyleData;
 import net.fabricmc.loader.api.FabricLoader;
 
 
 import java.io.*;
-import java.nio.file.Paths;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 
 
 public class ConfigManager {
-    private static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().setLenient().create();
+    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().setLenient()
+            .registerTypeHierarchyAdapter(MinecraftPredicate.class, GsonPredicateSerializer.INSTANCE)
+            .registerTypeAdapter(StyleData.ElementList.class, new StyleData.ElementList.Serializer())
+            .create();
 
     private static Config CONFIG;
     private static boolean ENABLED = false;
@@ -35,40 +43,83 @@ public class ConfigManager {
 
         CONFIG = null;
         try {
+            var configDir =  FabricLoader.getInstance().getConfigDir().resolve("styledplayerlist");
 
-            File configStyle = Paths.get("", "config", "styledplayerlist", "styles").toFile();
-            File configDir = Paths.get("", "config", "styledplayerlist").toFile();
+            var configStyle = configDir.resolve("styles");
+            var configStyleLegacy = configDir.resolve("styles_old");
 
-            if (configStyle.mkdirs()) {
-                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(configStyle, "default.json")), "UTF-8"));
+            if (!Files.exists(configStyle)) {
+                Files.createDirectories(configStyle);
+                BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(configStyle.resolve("default.json")), "UTF-8"));
                 writer.write(GSON.toJson(DefaultValues.exampleStyleData()));
+                writer.close();
+
+                writer = new BufferedWriter(new OutputStreamWriter(Files.newOutputStream(configStyle.resolve("animated.json")), "UTF-8"));
+                writer.write(GSON.toJson(DefaultValues.exampleAnimatedStyleData()));
                 writer.close();
             }
 
             ConfigData config;
 
-            File configFile = new File(configDir, "config.json");
+            var configFile = configDir.resolve("config.json");
+            LegacyConfigData legacyConfigData = null;
+            if (Files.exists(configFile)) {
+                var data = JsonParser.parseString(Files.readString(configFile));
 
+                if (data.getAsJsonObject().has("CONFIG_VERSION_DONT_TOUCH_THIS")) {
+                    legacyConfigData = GSON.fromJson(data, LegacyConfigData.class);
+                    Files.writeString(configDir.resolve("config.json_old"), data.toString());
+                    config = legacyConfigData.convert();
+                } else {
+                    config = GSON.fromJson(data, ConfigData.class);
+                }
 
-            if (configFile.exists()) {
-                config = GSON.fromJson(new InputStreamReader(new FileInputStream(configFile), "UTF-8"), ConfigData.class);
             } else {
                 config = new ConfigData();
             }
 
-            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(configFile), "UTF-8"));
-            writer.write(GSON.toJson(config));
-            writer.close();
+            Files.writeString(configFile, GSON.toJson(config));
 
             STYLES.clear();
 
-            FilenameFilter filter = (dir, name) -> name.endsWith(".json");
+            var finalLegacyConfigData = legacyConfigData;
+            Files.list(configStyle).filter((name) -> !name.endsWith(".json")).forEach((path) -> {
+                String data;
+                try {
+                    data = Files.readString(path);;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return;
+                }
 
-            for (String fileName : configStyle.list(filter)) {
-                PlayerListStyle style = new PlayerListStyle(GSON.fromJson(new InputStreamReader(new FileInputStream(new File(configStyle, fileName)), "UTF-8"), StyleData.class));
+                var json = JsonParser.parseString(data);
+                StyleData styleData;
 
-                STYLES.put(style.id, style);
-            }
+                if (json.getAsJsonObject().has("permission")) {
+                    styleData = GSON.fromJson(data, LegacyStyleData.class).convert(finalLegacyConfigData);
+
+                    try {
+                        Files.createDirectories(configStyleLegacy);
+                        Files.writeString(configStyleLegacy.resolve(path.getFileName().toString()), data);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    styleData = GSON.fromJson(data, StyleData.class);
+                }
+
+                try {
+                    Files.writeString(path, GSON.toJson(styleData));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                var name = path.getFileName().toString();
+                name = name.substring(0, name.length() - 5);
+
+                var style = new PlayerListStyle(name, styleData);
+                STYLES.put(name, style);
+            });
 
             PlayerList.PLAYER_LIST_STYLE_LOAD.invoker().onPlayerListUpdate(new PlayerList.StyleHelper(STYLES));
             CONFIG = new Config(config);
