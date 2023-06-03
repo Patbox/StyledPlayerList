@@ -65,7 +65,7 @@ public class Commands {
 
     private static int reloadConfig(CommandContext<ServerCommandSource> context) {
         if (ConfigManager.loadConfig()) {
-            context.getSource().sendFeedback(Text.literal("Reloaded config!"), false);
+            context.getSource().sendFeedback(() -> Text.literal("Reloaded config!"), false);
         } else {
             context.getSource().sendError(Text.literal("Error accrued while reloading config!").formatted(Formatting.RED));
         }
@@ -78,7 +78,7 @@ public class Commands {
 
     private static int about(CommandContext<ServerCommandSource> context) {
         for (var text : (context.getSource().getEntity() instanceof ServerPlayerEntity ? GenericModInfo.getAboutFull() : GenericModInfo.getAboutConsole())) {
-            context.getSource().sendFeedback(text, false);
+            context.getSource().sendFeedback(() -> text, false);
         };
 
         return 1;
@@ -90,7 +90,7 @@ public class Commands {
         Collection<ServerPlayerEntity> target = EntityArgumentType.getPlayers(context, "targets");
 
         if (!ConfigManager.styleExist(styleId)) {
-            source.sendFeedback(ConfigManager.getConfig().unknownStyleMessage, false);
+            source.sendFeedback(() -> ConfigManager.getConfig().unknownStyleMessage, false);
             return 0;
         }
 
@@ -100,7 +100,7 @@ public class Commands {
             ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$setStyle(styleId);
         }
 
-        source.sendFeedback(Text.literal("Changed player list style of targets to " + style.name), false);
+        source.sendFeedback(() -> Text.literal("Changed player list style of targets to " + style.name), false);
 
 
         return 2;
@@ -112,7 +112,7 @@ public class Commands {
             String styleId = context.getArgument("style", String.class);
 
             if (!ConfigManager.styleExist(styleId)) {
-                source.sendFeedback(ConfigManager.getConfig().unknownStyleMessage, false);
+                source.sendFeedback(() -> ConfigManager.getConfig().unknownStyleMessage, false);
                 return 0;
             }
 
@@ -123,13 +123,13 @@ public class Commands {
                 if (style.hasPermission(player)) {
                     ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$setStyle(styleId);
 
-                    source.sendFeedback(ConfigManager.getConfig().getSwitchMessage(player, style.name), false);
+                    source.sendFeedback(() -> ConfigManager.getConfig().getSwitchMessage(player, style.name), false);
                     return 1;
                 } else {
-                    source.sendFeedback(ConfigManager.getConfig().permissionMessage, false);
+                    source.sendFeedback(() -> ConfigManager.getConfig().permissionMessage, false);
                 }
             } else {
-                source.sendFeedback(Text.literal("Only players can use this command!"), false);
+                source.sendFeedback(() -> Text.literal("Only players can use this command!"), false);
             }
         } catch (Exception e) {
             e.printStackTrace();

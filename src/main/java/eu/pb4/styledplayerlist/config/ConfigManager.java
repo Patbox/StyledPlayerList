@@ -12,6 +12,7 @@ import eu.pb4.styledplayerlist.config.data.StyleData;
 import eu.pb4.styledplayerlist.config.data.legacy.LegacyConfigData;
 import eu.pb4.styledplayerlist.config.data.legacy.LegacyStyleData;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.util.Identifier;
 
 
 import java.io.*;
@@ -29,6 +30,7 @@ public class ConfigManager {
     private static Config CONFIG;
     private static boolean ENABLED = false;
     private static final LinkedHashMap<String, PlayerListStyle> STYLES = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, StyleData> STYLES_DATA = new LinkedHashMap<>();
 
     public static Config getConfig() {
         return CONFIG;
@@ -116,9 +118,9 @@ public class ConfigManager {
 
                 var name = path.getFileName().toString();
                 name = name.substring(0, name.length() - 5);
-
                 var style = new PlayerListStyle(name, styleData);
                 STYLES.put(name, style);
+                STYLES_DATA.put(name, styleData);
             });
 
             PlayerList.PLAYER_LIST_STYLE_LOAD.invoker().onPlayerListUpdate(new PlayerList.StyleHelper(STYLES));
@@ -145,5 +147,11 @@ public class ConfigManager {
 
     public static String getDefault() {
         return ENABLED ? CONFIG.configData.defaultStyle : "default";
+    }
+
+    public static void rebuildStyled() {
+        for (var e : STYLES_DATA.entrySet()) {
+            STYLES.put(e.getKey(), new PlayerListStyle(e.getKey(), e.getValue()));
+        }
     }
 }

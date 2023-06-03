@@ -1,6 +1,7 @@
 package eu.pb4.styledplayerlist;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.styledplayerlist.access.PlayerListViewerHolder;
 import eu.pb4.styledplayerlist.command.Commands;
 import eu.pb4.styledplayerlist.config.ConfigManager;
@@ -37,6 +38,8 @@ public class PlayerList implements ModInitializer {
 			CardboardWarning.checkAndAnnounce();
 			//MicroScheduler.get(s).scheduleRepeating(50, () -> tick(s));
 		});
+
+		Placeholders.registerChangeEvent((a, b) -> ConfigManager.rebuildStyled());
 	}
 
 	private void tick(MinecraftServer server) {
