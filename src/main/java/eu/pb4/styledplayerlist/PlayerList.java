@@ -30,11 +30,9 @@ public class PlayerList implements ModInitializer {
 	public void onInitialize() {
 		GenericModInfo.build(FabricLoader.getInstance().getModContainer(ID).get());
 		Commands.register();
-		ServerLifecycleEvents.SERVER_STARTING.register((s) -> {
-			ConfigManager.loadConfig();
-		});
-
 		ServerLifecycleEvents.SERVER_STARTED.register(s -> {
+			ConfigManager.loadConfig();
+
 			CardboardWarning.checkAndAnnounce();
 			//MicroScheduler.get(s).scheduleRepeating(50, () -> tick(s));
 		});

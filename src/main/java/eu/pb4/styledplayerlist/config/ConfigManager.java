@@ -150,6 +150,9 @@ public class ConfigManager {
     }
 
     public static void rebuildStyled() {
+        if (CONFIG != null) {
+            CONFIG = new Config(CONFIG.configData);
+        }
         for (var e : STYLES_DATA.entrySet()) {
             STYLES.put(e.getKey(), new PlayerListStyle(e.getKey(), e.getValue()));
         }
