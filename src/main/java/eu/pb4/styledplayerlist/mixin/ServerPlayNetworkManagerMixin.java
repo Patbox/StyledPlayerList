@@ -16,6 +16,8 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket;
 import net.minecraft.network.packet.s2c.play.PlayerListS2CPacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.network.ConnectedClientData;
+import net.minecraft.server.network.ServerCommonNetworkHandler;
 import net.minecraft.server.network.ServerPlayNetworkHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import org.spongepowered.asm.mixin.Final;
@@ -32,13 +34,9 @@ import java.util.List;
 import static eu.pb4.styledplayerlist.PlayerList.id;
 
 @Mixin(ServerPlayNetworkHandler.class)
-public abstract class ServerPlayNetworkManagerMixin implements PlayerListViewerHolder {
+public abstract class ServerPlayNetworkManagerMixin extends ServerCommonNetworkHandler implements PlayerListViewerHolder {
 
     @Shadow public ServerPlayerEntity player;
-
-    @Shadow public abstract void sendPacket(Packet<?> packet);
-
-    @Shadow @Final private MinecraftServer server;
 
     @Unique
     private String styledPlayerList$activeStyle = ConfigManager.getDefault();
@@ -49,8 +47,12 @@ public abstract class ServerPlayNetworkManagerMixin implements PlayerListViewerH
     @Unique
     private int styledPlayerList$animationTick = 0;
 
+    public ServerPlayNetworkManagerMixin(MinecraftServer server, ClientConnection connection, ConnectedClientData clientData) {
+        super(server, connection, clientData);
+    }
+
     @Inject(method = "<init>", at = @At("TAIL"))
-    private void styledPlayerList$loadData(MinecraftServer server, ClientConnection connection, ServerPlayerEntity player, CallbackInfo ci) {
+    private void styledPlayerList$loadData(MinecraftServer server, ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
         try {
             NbtString style = PlayerDataApi.getGlobalDataFor(player, id("style"), NbtString.TYPE);
 
