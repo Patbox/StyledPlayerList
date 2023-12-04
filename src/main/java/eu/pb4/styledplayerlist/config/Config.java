@@ -30,6 +30,8 @@ public class Config {
 
     public final ConfigData configData;
     public final TextNode playerNameFormat;
+
+    public final TextNode rightFormat;
     public final TextNode switchMessage;
     public final Text unknownStyleMessage;
     public final Text permissionMessage;
@@ -41,6 +43,7 @@ public class Config {
     public Config(ConfigData data) {
         this.configData = data;
         this.playerNameFormat = parseText(data.playerName.playerNameFormat);
+        this.rightFormat = parseText(data.playerName.rightTextFormat);
         this.switchMessage = parseText(data.messages.switchMessage);
         this.unknownStyleMessage = parseText(data.messages.unknownStyleMessage).toText();
         this.permissionMessage = parseText(data.messages.permissionMessage).toText();
@@ -51,28 +54,43 @@ public class Config {
 
         for (ConfigData.PermissionNameFormat entry : data.playerName.permissionNameFormat) {
             this.permissionNameFormat.add(new PermissionNameFormat(entry.require != null ? entry.require : BuiltinPredicates.operatorLevel(5),
-                    parseText(entry.format), entry.ignoreFormatting,  entry.hidePlayer != null ? entry.hidePlayer : isHiddenDefault));
+                    parseText(entry.format), parseText(entry.rightTextFormat), entry.ignoreFormatting,  entry.hidePlayer != null ? entry.hidePlayer : isHiddenDefault));
         }
     }
 
-    public static TextNode parseText(String string) {
+    @Nullable
+    public static TextNode parseText(@Nullable String string) {
+        if (string == null) {
+            return null;
+        }
         return PARSER.parseNode(string);
     }
 
     public Text getSwitchMessage(ServerPlayerEntity player, String target) {
-        return this.switchMessage.toText(ParserContext.of(DynamicNode.NODES, Map.of("style", Text.literal(target))));
+        return this.switchMessage.toText(ParserContext.of(DynamicNode.NODES, Map.of("name", Text.literal(target))));
     }
 
     @Nullable
     public Text formatPlayerUsername(ServerPlayerEntity player) {
         var context = PredicateContext.of(player);
         for (PermissionNameFormat entry : this.permissionNameFormat) {
-            if (entry.predicate.test(context).success()) {
-                return entry.passthrough ? null : entry.style.toText(PlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
+            if (entry.name != null && entry.predicate.test(context).success()) {
+                return entry.passthrough ? null : entry.name.toText(PlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
             }
         }
 
-        return this.passthroughDefault ? null :this.playerNameFormat.toText(PlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
+        return this.passthroughDefault ? null : this.playerNameFormat.toText(PlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
+    }
+
+    public Text formatPlayerRightText(ServerPlayerEntity player) {
+        var context = PredicateContext.of(player);
+        for (PermissionNameFormat entry : this.permissionNameFormat) {
+            if (entry.right != null && entry.predicate.test(context).success()) {
+                return entry.right.toText(PlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
+            }
+        }
+
+        return this.rightFormat.toText(PlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
     }
 
     public boolean isPlayerHidden(ServerPlayerEntity player) {
@@ -87,6 +105,6 @@ public class Config {
     }
 
 
-    record PermissionNameFormat(MinecraftPredicate predicate, TextNode style, boolean passthrough, boolean hidden) {
+    record PermissionNameFormat(MinecraftPredicate predicate, @Nullable TextNode name, @Nullable TextNode right, boolean passthrough, boolean hidden) {
     }
 }

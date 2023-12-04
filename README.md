@@ -41,12 +41,16 @@ See [this page](https://github.com/Patbox/PredicateAPI/blob/1.19.4/BUILTIN.md) f
   "player": {
     // Toggles this feature.
     "modify_name": false,
+    // Toggles modification of text on right of player name
+    "modify_right_text": false,
     // Hides player name from player list. Doesn't have any effect on commands, suggestions or entity visibility!
     "hidden": false,
     // Disables this formatting, forcing it to use vanilla one.
     "passthrough": false,
     // Default format of player name
     "format": "%player:displayname%",
+    // Text displayed on right of the name
+    "right_text": "",
     // Enables sending updates when player sends a message
     "update_on_chat_message": false,
     // Enables sending updates every provided amount of ticks. -1 disables it
@@ -58,6 +62,8 @@ See [this page](https://github.com/Patbox/PredicateAPI/blob/1.19.4/BUILTIN.md) f
         "require": {/* PREDICATE */},
         // Applied formatting, same as one above
         "format": "...",
+        // Text displayed on right of the name
+        "right_text": "",
         // Optional. Disables this formatting, forcing it to use vanilla one.
         "passthrough": false,
         // Optional, hides player name from player list. Doesn't have any effect on commands, suggestions or entity visibility!

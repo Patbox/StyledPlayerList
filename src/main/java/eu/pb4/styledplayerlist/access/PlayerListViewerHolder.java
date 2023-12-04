@@ -7,6 +7,7 @@ public interface PlayerListViewerHolder {
     String styledPlayerList$getStyle();
     void styledPlayerList$updateName();
     void styledPlayerList$reloadStyle();
+    void styledPlayerList$setupRightText();
     int styledPlayerList$getAndIncreaseAnimationTick();
 
     PlayerListStyle styledPlayerList$getStyleObject();

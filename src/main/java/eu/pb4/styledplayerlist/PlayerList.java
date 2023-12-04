@@ -13,6 +13,9 @@ import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraft.scoreboard.ScoreboardCriterion;
+import net.minecraft.scoreboard.ScoreboardObjective;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
@@ -25,6 +28,13 @@ import java.util.LinkedHashMap;
 public class PlayerList implements ModInitializer {
 	public static final Logger LOGGER = LogManager.getLogger("Styled Player List");
 	public static final String ID = "styledplayerlist";
+	public static final Scoreboard SCOREBOARD = new Scoreboard();
+	public static final String OBJECTIVE_NAME = "■SPL_OBJ";
+
+	public static final ScoreboardObjective SCOREBOARD_OBJECTIVE = new ScoreboardObjective(
+			SCOREBOARD, OBJECTIVE_NAME, ScoreboardCriterion.DUMMY,
+			Text.empty(), ScoreboardCriterion.RenderType.INTEGER, false, null);
+
 
 	@Override
 	public void onInitialize() {

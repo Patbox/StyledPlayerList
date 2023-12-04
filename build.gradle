@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.0.+'
+	id 'fabric-loom' version '1.4.+'
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "2.+"
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
@@ -33,8 +33,8 @@ dependencies {
 	modLocalRuntime("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
 
 	modImplementation include("eu.pb4:predicate-api:0.3.0+1.20.2")
-	modImplementation include("eu.pb4:placeholder-api:2.2.0+1.20.2")
-	modImplementation include("eu.pb4:player-data-api:0.3.0+1.20.2")
+	modImplementation include("eu.pb4:placeholder-api:2.3.0+1.20.3")
+	modImplementation include("eu.pb4:player-data-api:0.4.0+1.20.3")
 	modImplementation include("me.lucko:fabric-permissions-api:0.1-SNAPSHOT")
 
 	modCompileOnly "carpet:fabric-carpet:${project.carpet_core_version}"

@@ -71,6 +71,7 @@ public class Commands {
         }
         for (var player : context.getSource().getServer().getPlayerManager().getPlayerList()) {
             ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$reloadStyle();
+            ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$setupRightText();
         }
 
         return 1;

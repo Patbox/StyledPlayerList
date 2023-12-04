@@ -33,12 +33,16 @@ public class ConfigData {
     public static class PlayerName {
         @SerializedName("modify_name")
         public boolean changePlayerName = false;
+        @SerializedName("modify_right_text")
+        public boolean changeRightText = false;
         @SerializedName("passthrough")
         public boolean ignoreFormatting = false;
         @SerializedName("hidden")
         public boolean hidePlayer = false;
         @SerializedName("format")
         public String playerNameFormat = "%player:displayname%";
+        @SerializedName("right_text")
+        public String rightTextFormat = "";
         @SerializedName("update_on_chat_message")
         public boolean updatePlayerNameEveryChatMessage = false;
         @SerializedName("update_tick_time")
@@ -52,9 +56,12 @@ public class ConfigData {
         @SerializedName("require")
         public MinecraftPredicate require;
         @SerializedName("format")
-        public String format = "";
+        public String format = null;
+        @SerializedName("right_text")
+        public String rightTextFormat = null;
         @SerializedName("passthrough")
         public boolean ignoreFormatting = false;
+
         @SerializedName("hidden")
         public Boolean hidePlayer;
 
