@@ -88,8 +88,9 @@ public class ConfigManager {
             Files.list(configStyle).filter((name) -> !name.endsWith(".json")).forEach((path) -> {
                 String data;
                 try {
-                    data = Files.readString(path);;
+                    data = Files.readString(path);
                 } catch (IOException e) {
+                    if (path.endsWith(".DS_Store")) return;
                     e.printStackTrace();
                     return;
                 }
