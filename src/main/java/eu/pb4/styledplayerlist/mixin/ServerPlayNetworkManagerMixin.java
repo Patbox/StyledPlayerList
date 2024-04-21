@@ -33,6 +33,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Optional;
 
 import static eu.pb4.styledplayerlist.PlayerList.id;
 
@@ -132,9 +133,9 @@ public abstract class ServerPlayNetworkManagerMixin extends ServerCommonNetworkH
             }
 
             if (ConfigManager.getConfig().configData.playerName.changeRightText) {
-                var packet = new ScoreboardScoreUpdateS2CPacket(this.player.getNameForScoreboard(), PlayerList.OBJECTIVE_NAME, 0, null, new FixedNumberFormat(
+                var packet = new ScoreboardScoreUpdateS2CPacket(this.player.getNameForScoreboard(), PlayerList.OBJECTIVE_NAME, 0, Optional.empty(), Optional.of(new FixedNumberFormat(
                         ConfigManager.getConfig().formatPlayerRightText(this.player)
-                ));
+                )));
                 this.server.getPlayerManager().sendToAll(packet);
             }
         } catch (Exception e) {
@@ -151,9 +152,9 @@ public abstract class ServerPlayNetworkManagerMixin extends ServerCommonNetworkH
             this.sendPacket(new ScoreboardObjectiveUpdateS2CPacket(PlayerList.SCOREBOARD_OBJECTIVE, ScoreboardObjectiveUpdateS2CPacket.ADD_MODE));
             this.sendPacket(new ScoreboardDisplayS2CPacket(ScoreboardDisplaySlot.LIST, PlayerList.SCOREBOARD_OBJECTIVE));
             for (var player : this.server.getPlayerManager().getPlayerList()) {
-                var packet = new ScoreboardScoreUpdateS2CPacket(player.getNameForScoreboard(), PlayerList.OBJECTIVE_NAME, 0, null, new FixedNumberFormat(
+                var packet = new ScoreboardScoreUpdateS2CPacket(player.getNameForScoreboard(), PlayerList.OBJECTIVE_NAME, 0, Optional.empty(), Optional.of(new FixedNumberFormat(
                         ConfigManager.getConfig().formatPlayerRightText(player)
-                ));
+                )));
                 this.sendPacket(packet);
             }
         } else if (!config.configData.playerName.changeRightText && this.styledPlayerList$hasRightText) {

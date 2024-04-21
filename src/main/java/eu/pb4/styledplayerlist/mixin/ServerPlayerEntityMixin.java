@@ -16,7 +16,7 @@ public class ServerPlayerEntityMixin {
             if (ConfigManager.isEnabled() && ConfigManager.getConfig().configData.playerName.changePlayerName) {
                 cir.setReturnValue(ConfigManager.getConfig().formatPlayerUsername((ServerPlayerEntity) (Object) this));
             }
-        } catch (Exception e) {
+        } catch (Exception ignored) {
 
         }
     }

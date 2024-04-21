@@ -22,11 +22,12 @@ import java.util.List;
 import java.util.Map;
 
 public class Config {
-    public static final NodeParser PARSER = NodeParser.merge(
-            TextParserV1.DEFAULT, Placeholders.DEFAULT_PLACEHOLDER_PARSER,
-            new PatternPlaceholderParser(PatternPlaceholderParser.PREDEFINED_PLACEHOLDER_PATTERN, DynamicNode::of),
-            StaticPreParser.INSTANCE
-    );
+    public static final NodeParser PARSER = NodeParser.builder()
+            .simplifiedTextFormat()
+            .quickText()
+            .globalPlaceholders()
+            .staticPreParsing()
+            .build();
 
     public final ConfigData configData;
     public final TextNode playerNameFormat;

@@ -10,7 +10,7 @@ import java.util.Collection;
 
 @Mixin(InGameHud.class)
 public class InGameHudMixin {
-    @Redirect(method = "render", at = @At(value = "INVOKE", target = "Ljava/util/Collection;size()I"), require = 0)
+    @Redirect(method = "renderPlayerList", at = @At(value = "INVOKE", target = "Ljava/util/Collection;size()I"), require = 0)
     private int styledPlayerList$replaceWithZero(Collection instance) {
         return ConfigManager.getConfig().configData.displayOnSingleplayer ? 999 : instance.size();
     }

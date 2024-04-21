@@ -21,6 +21,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+import java.util.Optional;
+
 @Mixin(PlayerManager.class)
 public abstract class PlayerManagerMixin {
     @Shadow public abstract void sendToAll(Packet<?> packet);
@@ -29,8 +31,8 @@ public abstract class PlayerManagerMixin {
     private void sendStuff(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci, @Local ServerPlayNetworkHandler handler) {
 
         ((PlayerListViewerHolder) handler).styledPlayerList$setupRightText();
-        var packet = new ScoreboardScoreUpdateS2CPacket(player.getNameForScoreboard(), PlayerList.OBJECTIVE_NAME, 0, null, new FixedNumberFormat(
-                ConfigManager.getConfig().formatPlayerRightText(player)
+        var packet = new ScoreboardScoreUpdateS2CPacket(player.getNameForScoreboard(), PlayerList.OBJECTIVE_NAME, 0, Optional.empty(), Optional.of(new FixedNumberFormat(
+                ConfigManager.getConfig().formatPlayerRightText(player))
         ));
         this.sendToAll(packet);
         handler.sendPacket(packet);
