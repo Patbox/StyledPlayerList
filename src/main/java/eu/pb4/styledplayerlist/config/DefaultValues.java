@@ -10,13 +10,13 @@ public class DefaultValues {
     public static StyleData exampleStyleData() {
         StyleData data = new StyleData();
         data.header.values.add(List.of("",
-                "<gr:#4adeff:#3d8eff><bold> Styled Player List</bold></gr> ⛏ ",
+                "<gr #4adeff #3d8eff><bold> Styled Player List</bold></gr> ⛏ ",
                 "",
-                "<color:#555555><strikethrough>        </strikethrough>[ </color><color:#FF5555>%server:online%<color:#6666676>/</color>%server:max_players%</color><color:#555555> ]<strikethrough>        </strikethrough></color>",
+                "<color #555555><strikethrough>        </strikethrough>[ </color><color #FF5555>%server:online%<color #6666676>/</color>%server:max_players%</color><color #555555> ]<strikethrough>        </strikethrough></color>",
                 ""));
 
         data.footer.values.add(List.of("",
-                "<color:#555555><strikethrough>                          </strikethrough></color>",
+                "<color #555555><strikethrough>                          </strikethrough></color>",
                 "",
                 "<gray>TPS: %server:tps_colored% <dark_gray>|</dark_gray> <gray>Ping: <color:#ffba26>%player:ping%</color>",
                 ""));

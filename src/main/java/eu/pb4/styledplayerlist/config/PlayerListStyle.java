@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerListStyle {
-    private static final NodeParser PARSER = NodeParser.merge(TextParserV1.DEFAULT, Placeholders.DEFAULT_PLACEHOLDER_PARSER, StaticPreParser.INSTANCE);
-
     public final String id;
     public final String name;
 
@@ -58,7 +56,7 @@ public class PlayerListStyle {
         return this.footer.getFor(tick).toText(context);
     }
 
-    private interface AnimatedText {
+    public interface AnimatedText {
         TextNode getFor(int tick);
 
         static AnimatedText from(StyleData.ElementList elementList, boolean legacy) {
@@ -69,11 +67,11 @@ public class PlayerListStyle {
             var joiner = legacy ? "\n" : "\n<r>";
 
             if (elementList.values.size() == 1) {
-                return AnimatedText.of(PARSER.parseNode(String.join(joiner, elementList.values.get(0))));
+                return AnimatedText.of(Config.PARSER.parseNode(String.join(joiner, elementList.values.get(0))));
             } else {
                 var list = new ArrayList<TextNode>();
                 for (var x : elementList.values) {
-                    list.add(PARSER.parseNode(String.join(joiner, x)));
+                    list.add(Config.PARSER.parseNode(String.join(joiner, x)));
                 }
                 return of(list, Math.max(elementList.changeRate, 1));
             }
