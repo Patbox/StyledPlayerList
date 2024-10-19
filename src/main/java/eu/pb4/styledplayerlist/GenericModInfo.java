@@ -68,7 +68,7 @@ public class GenericModInfo {
                             ))
                     .append("] ")
             ).append(Text.literal("[")
-                    .append(Text.literal("Github")
+                    .append(Text.literal("GitHub")
                             .setStyle(Style.EMPTY.withColor(Formatting.BLUE).withUnderline(true)
                                     .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, github))
                                     .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
