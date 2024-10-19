@@ -27,9 +27,9 @@ import java.util.Optional;
 public abstract class PlayerManagerMixin {
     @Shadow public abstract void sendToAll(Packet<?> packet);
 
-    @Inject(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;sendScoreboard(Lnet/minecraft/scoreboard/ServerScoreboard;Lnet/minecraft/server/network/ServerPlayerEntity;)V"))
-    private void sendStuff(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci, @Local ServerPlayNetworkHandler handler) {
-
+    @Inject(method = "onPlayerConnect", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/PlayerManager;sendWorldInfo(Lnet/minecraft/server/network/ServerPlayerEntity;Lnet/minecraft/server/world/ServerWorld;)V"))
+    private void sendStuff(ClientConnection connection, ServerPlayerEntity player, ConnectedClientData clientData, CallbackInfo ci) {
+        var handler = player.networkHandler;
         ((PlayerListViewerHolder) handler).styledPlayerList$setupRightText();
         var packet = new ScoreboardScoreUpdateS2CPacket(player.getNameForScoreboard(), PlayerList.OBJECTIVE_NAME, 0, Optional.empty(), Optional.of(new FixedNumberFormat(
                 ConfigManager.getConfig().formatPlayerRightText(player))
