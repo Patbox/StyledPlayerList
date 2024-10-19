@@ -20,4 +20,18 @@ public class ServerPlayerEntityMixin {
 
         }
     }
+
+    @Inject(method = "getPlayerListOrder", at = @At("HEAD"), cancellable = true)
+    private void styledPlayerList$getPlayerListIndex(CallbackInfoReturnable<Integer> cir) {
+        try {
+            if (ConfigManager.isEnabled() && ConfigManager.getConfig().configData.playerName.modifyListOrder) {
+                var x = ConfigManager.getConfig().sortingIndex((ServerPlayerEntity) (Object) this);
+                if (x != null) {
+                    cir.setReturnValue(x);
+                }
+            }
+        } catch (Exception ignored) {
+
+        }
+    }
 }

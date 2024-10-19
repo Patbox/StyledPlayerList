@@ -127,8 +127,21 @@ public abstract class ServerPlayNetworkManagerMixin extends ServerCommonNetworkH
                 return;
             }
 
+            var list = EnumSet.noneOf(PlayerListS2CPacket.Action.class);
             if (ConfigManager.getConfig().configData.playerName.changePlayerName) {
-                PlayerListS2CPacket packet = new PlayerListS2CPacket(EnumSet.of(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME, PlayerListS2CPacket.Action.UPDATE_LISTED), List.of(this.player));
+                list.add(PlayerListS2CPacket.Action.UPDATE_DISPLAY_NAME);
+            }
+
+            if (ConfigManager.getConfig().configData.playerName.modifyListOrder) {
+                list.add(PlayerListS2CPacket.Action.UPDATE_LIST_ORDER);
+            }
+
+            if (ConfigManager.getConfig().configData.playerName.changeVisiblity) {
+                list.add(PlayerListS2CPacket.Action.UPDATE_LISTED);
+            }
+
+            if (!list.isEmpty()) {
+                PlayerListS2CPacket packet = new PlayerListS2CPacket(list, List.of(this.player));
                 this.server.getPlayerManager().sendToAll(packet);
             }
 

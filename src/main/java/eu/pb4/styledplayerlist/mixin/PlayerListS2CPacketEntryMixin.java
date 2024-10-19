@@ -11,6 +11,6 @@ import org.spongepowered.asm.mixin.injection.ModifyConstant;
 public class PlayerListS2CPacketEntryMixin {
     @ModifyConstant(method = "<init>(Lnet/minecraft/server/network/ServerPlayerEntity;)V", constant = @Constant(intValue = 1, ordinal = 0))
     private static int styledPlayerList$hideRealPlayer(int constant, ServerPlayerEntity player) {
-        return ConfigManager.getConfig().isPlayerHidden(player) ? 0 : 1;
+        return ConfigManager.getConfig().configData.playerName.changeVisiblity ? (ConfigManager.getConfig().isPlayerHidden(player) ? 0 : 1) : constant;
     }
 }

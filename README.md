@@ -39,17 +39,21 @@ See [this page](https://github.com/Patbox/PredicateAPI/blob/1.19.4/BUILTIN.md) f
   },
   // Modifies how player name is displayed
   "player": {
-    // Toggles this feature.
+    // Toggles changing of player name on the list.
     "modify_name": false,
-    // Toggles modification of text on right of player name
+    // Toggles modification of text on right of player name. Available since 3.3.0+1.20.3
     "modify_right_text": false,
+    // Toggles setting of different player positions on player list with a sorting index. Available since 3.6.0+1.21.2
+    "modify_list_order": false,
+    // Toggles modification of player name visibility on player list through hidden parameter. Available since 3.6.0+1.21.2, always enabled before.
+    "modify_visibility": false,
     // Hides player name from player list. Doesn't have any effect on commands, suggestions or entity visibility!
     "hidden": false,
     // Disables this formatting, forcing it to use vanilla one.
     "passthrough": false,
     // Default format of player name
     "format": "%player:displayname%",
-    // Text displayed on right of the name
+    // Text displayed on right of the name. Available since 3.3.0+1.20.3
     "right_text": "",
     // Enables sending updates when player sends a message
     "update_on_chat_message": false,
@@ -60,10 +64,12 @@ See [this page](https://github.com/Patbox/PredicateAPI/blob/1.19.4/BUILTIN.md) f
       {
         // Requirement of style, used for applying
         "require": {/* PREDICATE */},
-        // Applied formatting, same as one above
+        // (Optional) Applied formatting, same as one above. If not set defaults to next valid one.
         "format": "...",
-        // Text displayed on right of the name
+        // (Optional) Text displayed on right of the name. If not set defaults to next valid one.
         "right_text": "",
+        // Optional. Sorting index for player list. If not set defaults to next valid one, with 0 being default one. Available since 3.6.0+1.21.2
+        "sorting_index": 0,
         // Optional. Disables this formatting, forcing it to use vanilla one.
         "passthrough": false,
         // Optional, hides player name from player list. Doesn't have any effect on commands, suggestions or entity visibility!

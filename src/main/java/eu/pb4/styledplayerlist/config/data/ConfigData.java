@@ -35,6 +35,10 @@ public class ConfigData {
         public boolean changePlayerName = false;
         @SerializedName("modify_right_text")
         public boolean changeRightText = false;
+        @SerializedName("modify_list_order")
+        public boolean modifyListOrder = false;
+        @SerializedName("modify_visibility")
+        public boolean changeVisiblity = false;
         @SerializedName("passthrough")
         public boolean ignoreFormatting = false;
         @SerializedName("hidden")
@@ -59,6 +63,8 @@ public class ConfigData {
         public String format = null;
         @SerializedName("right_text")
         public String rightTextFormat = null;
+        @SerializedName("sorting_index")
+        public Integer index = null;
         @SerializedName("passthrough")
         public boolean ignoreFormatting = false;
 

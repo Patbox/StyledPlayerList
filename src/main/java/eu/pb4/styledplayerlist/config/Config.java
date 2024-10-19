@@ -2,12 +2,8 @@ package eu.pb4.styledplayerlist.config;
 
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.Placeholders;
 import eu.pb4.placeholders.api.node.TextNode;
 import eu.pb4.placeholders.api.parsers.NodeParser;
-import eu.pb4.placeholders.api.parsers.PatternPlaceholderParser;
-import eu.pb4.placeholders.api.parsers.StaticPreParser;
-import eu.pb4.placeholders.api.parsers.TextParserV1;
 import eu.pb4.predicate.api.BuiltinPredicates;
 import eu.pb4.predicate.api.MinecraftPredicate;
 import eu.pb4.predicate.api.PredicateContext;
@@ -55,7 +51,7 @@ public class Config {
 
         for (ConfigData.PermissionNameFormat entry : data.playerName.permissionNameFormat) {
             this.permissionNameFormat.add(new PermissionNameFormat(entry.require != null ? entry.require : BuiltinPredicates.operatorLevel(5),
-                    parseText(entry.format), parseText(entry.rightTextFormat), entry.ignoreFormatting,  entry.hidePlayer != null ? entry.hidePlayer : isHiddenDefault));
+                    parseText(entry.format), parseText(entry.rightTextFormat), entry.index, entry.ignoreFormatting, entry.hidePlayer != null ? entry.hidePlayer : isHiddenDefault));
         }
     }
 
@@ -105,7 +101,19 @@ public class Config {
         return this.isHiddenDefault;
     }
 
+    @Nullable
+    public Integer sortingIndex(ServerPlayerEntity player) {
+        var context = PredicateContext.of(player);
+        for (PermissionNameFormat entry : this.permissionNameFormat) {
+            if (entry.index != null && entry.predicate.test(context).success()) {
+                return entry.index;
+            }
+        }
 
-    record PermissionNameFormat(MinecraftPredicate predicate, @Nullable TextNode name, @Nullable TextNode right, boolean passthrough, boolean hidden) {
+        return null;
+    }
+
+
+    record PermissionNameFormat(MinecraftPredicate predicate, @Nullable TextNode name, @Nullable TextNode right, @Nullable Integer index, boolean passthrough, boolean hidden) {
     }
 }
