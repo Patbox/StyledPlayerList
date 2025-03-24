@@ -63,7 +63,7 @@ public abstract class ServerPlayNetworkManagerMixin extends ServerCommonNetworkH
             NbtString style = PlayerDataApi.getGlobalDataFor(player, id("style"), NbtString.TYPE);
 
             if (style != null) {
-                this.styledPlayerList$setStyle(style.asString());
+                this.styledPlayerList$setStyle(style.value());
             } else {
                 this.styledPlayerList$reloadStyle();
             }

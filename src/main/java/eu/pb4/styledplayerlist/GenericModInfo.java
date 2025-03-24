@@ -5,6 +5,7 @@ import net.minecraft.text.*;
 import net.minecraft.util.Formatting;
 
 import javax.imageio.ImageIO;
+import java.net.URI;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,13 +36,13 @@ public class GenericModInfo {
                         if (color == colorPixel) {
                             line++;
                         } else {
-                            base.append(Text.literal(chr.repeat(line)).setStyle(Style.EMPTY.withColor(color)));
+                            base.append(Text.literal(chr.repeat(line)).setStyle(Style.EMPTY.withColor(color).withShadowColor(color | 0xFF000000)));
                             color = colorPixel;
                             line = 1;
                         }
                     }
 
-                    base.append(Text.literal(chr.repeat(line)).setStyle(Style.EMPTY.withColor(color)));
+                    base.append(Text.literal(chr.repeat(line)).setStyle(Style.EMPTY.withColor(color).withShadowColor(color | 0xFF000000)));
                     icon.add(base);
                 }
                 GenericModInfo.icon = icon.toArray(new Text[0]);
@@ -62,7 +63,7 @@ public class GenericModInfo {
             extraData.append(Text.literal("[")
                     .append(Text.literal("Contributors")
                             .setStyle(Style.EMPTY.withColor(Formatting.AQUA)
-                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                    .withHoverEvent(new HoverEvent.ShowText(
                                             Text.literal(String.join("\n", contributors))
                                     ))
                             ))
@@ -70,8 +71,8 @@ public class GenericModInfo {
             ).append(Text.literal("[")
                     .append(Text.literal("GitHub")
                             .setStyle(Style.EMPTY.withColor(Formatting.BLUE).withUnderline(true)
-                                    .withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, github))
-                                    .withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT,
+                                    .withClickEvent(new ClickEvent.OpenUrl(URI.create(github)))
+                                    .withHoverEvent(new HoverEvent.ShowText(
                                             Text.literal(github)
                                     ))
                             ))
@@ -96,7 +97,7 @@ public class GenericModInfo {
             var output = new ArrayList<Text>();
             about.clear();
             try {
-                about.add(Text.literal(container.getMetadata().getName()).setStyle(Style.EMPTY.withColor(COLOR).withBold(true).withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, github))));
+                about.add(Text.literal(container.getMetadata().getName()).setStyle(Style.EMPTY.withColor(COLOR).withBold(true).withClickEvent(new ClickEvent.OpenUrl(URI.create(github)))));
                 about.add(Text.literal("Version: ").setStyle(Style.EMPTY.withColor(0xf7e1a7))
                         .append(Text.literal(container.getMetadata().getVersion().getFriendlyString()).setStyle(Style.EMPTY.withColor(Formatting.WHITE))));
 
