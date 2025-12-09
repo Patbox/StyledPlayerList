@@ -11,17 +11,15 @@ import eu.pb4.styledplayerlist.config.ConfigManager;
 import eu.pb4.styledplayerlist.config.PlayerListStyle;
 import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import java.util.Collection;
 import java.util.Locale;
 
-import static net.minecraft.server.command.CommandManager.literal;
+import static net.minecraft.commands.Commands.literal;
 
 public class Commands {
     public static void register() {
@@ -39,7 +37,7 @@ public class Commands {
 
                             .then(literal("switchothers")
                                     .requires(Permissions.require("styledplayerlist.switch.others", 2))
-                                    .then(CommandManager.argument("targets", EntityArgumentType.players())
+                                    .then(net.minecraft.commands.Commands.argument("targets", EntityArgument.players())
                                             .then(switchArgument("style")
                                                     .executes(Commands::switchStyleOthers)
                                             )
@@ -63,74 +61,74 @@ public class Commands {
         });
     }
 
-    private static int reloadConfig(CommandContext<ServerCommandSource> context) {
+    private static int reloadConfig(CommandContext<CommandSourceStack> context) {
         if (ConfigManager.loadConfig()) {
-            context.getSource().sendFeedback(() -> Text.literal("Reloaded config!"), false);
+            context.getSource().sendSuccess(() -> Component.literal("Reloaded config!"), false);
         } else {
-            context.getSource().sendError(Text.literal("Error accrued while reloading config!").formatted(Formatting.RED));
+            context.getSource().sendFailure(Component.literal("Error accrued while reloading config!").withStyle(ChatFormatting.RED));
         }
-        for (var player : context.getSource().getServer().getPlayerManager().getPlayerList()) {
-            ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$reloadStyle();
-            ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$setupRightText();
+        for (var player : context.getSource().getServer().getPlayerList().getPlayers()) {
+            ((PlayerListViewerHolder) player.connection).styledPlayerList$reloadStyle();
+            ((PlayerListViewerHolder) player.connection).styledPlayerList$setupRightText();
         }
 
         return 1;
     }
 
-    private static int about(CommandContext<ServerCommandSource> context) {
-        for (var text : (context.getSource().getEntity() instanceof ServerPlayerEntity ? GenericModInfo.getAboutFull() : GenericModInfo.getAboutConsole())) {
-            context.getSource().sendFeedback(() -> text, false);
+    private static int about(CommandContext<CommandSourceStack> context) {
+        for (var text : (context.getSource().getEntity() instanceof ServerPlayer ? GenericModInfo.getAboutFull() : GenericModInfo.getAboutConsole())) {
+            context.getSource().sendSuccess(() -> text, false);
         };
 
         return 1;
     }
 
-    public static int switchStyleOthers(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
-        ServerCommandSource source = context.getSource();
+    public static int switchStyleOthers(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
+        CommandSourceStack source = context.getSource();
         String styleId = context.getArgument("style", String.class);
-        Collection<ServerPlayerEntity> target = EntityArgumentType.getPlayers(context, "targets");
+        Collection<ServerPlayer> target = EntityArgument.getPlayers(context, "targets");
 
         if (!ConfigManager.styleExist(styleId)) {
-            source.sendFeedback(() -> ConfigManager.getConfig().unknownStyleMessage, false);
+            source.sendSuccess(() -> ConfigManager.getConfig().unknownStyleMessage, false);
             return 0;
         }
 
         PlayerListStyle style = ConfigManager.getStyle(styleId);
 
-        for (ServerPlayerEntity player : target) {
-            ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$setStyle(styleId);
+        for (ServerPlayer player : target) {
+            ((PlayerListViewerHolder) player.connection).styledPlayerList$setStyle(styleId);
         }
 
-        source.sendFeedback(() -> Text.literal("Changed player list style of targets to " + style.name), false);
+        source.sendSuccess(() -> Component.literal("Changed player list style of targets to " + style.name), false);
 
 
         return 2;
     }
 
-    private static int switchStyle(CommandContext<ServerCommandSource> context) throws CommandSyntaxException {
+    private static int switchStyle(CommandContext<CommandSourceStack> context) throws CommandSyntaxException {
         try {
-            ServerCommandSource source = context.getSource();
+            CommandSourceStack source = context.getSource();
             String styleId = context.getArgument("style", String.class);
 
             if (!ConfigManager.styleExist(styleId)) {
-                source.sendFeedback(() -> ConfigManager.getConfig().unknownStyleMessage, false);
+                source.sendSuccess(() -> ConfigManager.getConfig().unknownStyleMessage, false);
                 return 0;
             }
 
             PlayerListStyle style = ConfigManager.getStyle(styleId);
-            ServerPlayerEntity player = source.getPlayer();
+            ServerPlayer player = source.getPlayer();
 
-            if (player != null && player instanceof ServerPlayerEntity) {
+            if (player != null && player instanceof ServerPlayer) {
                 if (style.hasPermission(player)) {
-                    ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$setStyle(styleId);
+                    ((PlayerListViewerHolder) player.connection).styledPlayerList$setStyle(styleId);
 
-                    source.sendFeedback(() -> ConfigManager.getConfig().getSwitchMessage(player, style.name), false);
+                    source.sendSuccess(() -> ConfigManager.getConfig().getSwitchMessage(player, style.name), false);
                     return 1;
                 } else {
-                    source.sendFeedback(() -> ConfigManager.getConfig().permissionMessage, false);
+                    source.sendSuccess(() -> ConfigManager.getConfig().permissionMessage, false);
                 }
             } else {
-                source.sendFeedback(() -> Text.literal("Only players can use this command!"), false);
+                source.sendSuccess(() -> Component.literal("Only players can use this command!"), false);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -139,8 +137,8 @@ public class Commands {
         return 0;
     }
 
-    public static RequiredArgumentBuilder<ServerCommandSource, String> switchArgument(String name) {
-        return CommandManager.argument(name, StringArgumentType.word())
+    public static RequiredArgumentBuilder<CommandSourceStack, String> switchArgument(String name) {
+        return net.minecraft.commands.Commands.argument(name, StringArgumentType.word())
                 .suggests((ctx, builder) -> {
                     String remaining = builder.getRemaining().toLowerCase(Locale.ROOT);
 

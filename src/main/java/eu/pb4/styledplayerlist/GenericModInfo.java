@@ -1,9 +1,12 @@
 package eu.pb4.styledplayerlist;
 
 import net.fabricmc.loader.api.ModContainer;
-import net.minecraft.text.*;
-import net.minecraft.util.Formatting;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.ClickEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.HoverEvent;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import javax.imageio.ImageIO;
 import java.net.URI;
 import java.nio.file.Files;
@@ -14,20 +17,20 @@ import java.util.List;
 public class GenericModInfo {
     private static final int COLOR = 0x3d8eff;
 
-    private static Text[] icon = new Text[0];
-    private static Text[] about = new Text[0];
-    private static Text[] consoleAbout = new Text[0];
+    private static Component[] icon = new Component[0];
+    private static Component[] about = new Component[0];
+    private static Component[] consoleAbout = new Component[0];
 
     public static void build(ModContainer container) {
         var github = container.getMetadata().getContact().get("sources").orElse("UNKNOWN");
         {
             final String chr = "█";
-            var icon = new ArrayList<MutableText>();
+            var icon = new ArrayList<MutableComponent>();
             try {
                 var source = ImageIO.read(Files.newInputStream(container.getPath("assets/styled_player_list/icon_ingame.png")));
 
                 for (int y = 0; y < source.getHeight(); y++) {
-                    var base = Text.literal("");
+                    var base = Component.literal("");
                     int line = 0;
                     int color = source.getRGB(0, y) & 0xFFFFFF;
                     for (int x = 0; x < source.getWidth(); x++) {
@@ -36,16 +39,16 @@ public class GenericModInfo {
                         if (color == colorPixel) {
                             line++;
                         } else {
-                            base.append(Text.literal(chr.repeat(line)).setStyle(Style.EMPTY.withColor(color).withShadowColor(color | 0xFF000000)));
+                            base.append(Component.literal(chr.repeat(line)).setStyle(Style.EMPTY.withColor(color).withShadowColor(color | 0xFF000000)));
                             color = colorPixel;
                             line = 1;
                         }
                     }
 
-                    base.append(Text.literal(chr.repeat(line)).setStyle(Style.EMPTY.withColor(color).withShadowColor(color | 0xFF000000)));
+                    base.append(Component.literal(chr.repeat(line)).setStyle(Style.EMPTY.withColor(color).withShadowColor(color | 0xFF000000)));
                     icon.add(base);
                 }
-                GenericModInfo.icon = icon.toArray(new Text[0]);
+                GenericModInfo.icon = icon.toArray(new Component[0]);
             } catch (Throwable e) {
                 e.printStackTrace();
             }
@@ -57,52 +60,52 @@ public class GenericModInfo {
         container.getMetadata().getAuthors().forEach(x -> contributors.add(x.getName()));
         container.getMetadata().getContributors().forEach(x -> contributors.add(x.getName()));
 
-        var about = new ArrayList<Text>();
-        var extraData = Text.empty();
+        var about = new ArrayList<Component>();
+        var extraData = Component.empty();
         try {
-            extraData.append(Text.literal("[")
-                    .append(Text.literal("Contributors")
-                            .setStyle(Style.EMPTY.withColor(Formatting.AQUA)
+            extraData.append(Component.literal("[")
+                    .append(Component.literal("Contributors")
+                            .setStyle(Style.EMPTY.withColor(ChatFormatting.AQUA)
                                     .withHoverEvent(new HoverEvent.ShowText(
-                                            Text.literal(String.join("\n", contributors))
+                                            Component.literal(String.join("\n", contributors))
                                     ))
                             ))
                     .append("] ")
-            ).append(Text.literal("[")
-                    .append(Text.literal("GitHub")
-                            .setStyle(Style.EMPTY.withColor(Formatting.BLUE).withUnderline(true)
+            ).append(Component.literal("[")
+                    .append(Component.literal("GitHub")
+                            .setStyle(Style.EMPTY.withColor(ChatFormatting.BLUE).withUnderlined(true)
                                     .withClickEvent(new ClickEvent.OpenUrl(URI.create(github)))
                                     .withHoverEvent(new HoverEvent.ShowText(
-                                            Text.literal(github)
+                                            Component.literal(github)
                                     ))
                             ))
-                    .append("]")).setStyle(Style.EMPTY.withColor(Formatting.DARK_GRAY));
+                    .append("]")).setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY));
 
-            about.add(Text.empty()
-                    .append(Text.literal( container.getMetadata().getName() + " ").setStyle(Style.EMPTY.withColor(COLOR).withBold(true)))
-                    .append(Text.literal(container.getMetadata().getVersion().getFriendlyString()).setStyle(Style.EMPTY.withColor(Formatting.WHITE))));
+            about.add(Component.empty()
+                    .append(Component.literal( container.getMetadata().getName() + " ").setStyle(Style.EMPTY.withColor(COLOR).withBold(true)))
+                    .append(Component.literal(container.getMetadata().getVersion().getFriendlyString()).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE))));
 
-            about.add(Text.literal("» " + container.getMetadata().getDescription()).setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+            about.add(Component.literal("» " + container.getMetadata().getDescription()).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
 
             about.add(extraData);
         } catch (Throwable e) {
             e.printStackTrace();
         }
 
-        GenericModInfo.consoleAbout = about.toArray(new Text[0]);
+        GenericModInfo.consoleAbout = about.toArray(new Component[0]);
 
         if (icon.length == 0) {
             GenericModInfo.about = GenericModInfo.consoleAbout;
         } else {
-            var output = new ArrayList<Text>();
+            var output = new ArrayList<Component>();
             about.clear();
             try {
-                about.add(Text.literal(container.getMetadata().getName()).setStyle(Style.EMPTY.withColor(COLOR).withBold(true).withClickEvent(new ClickEvent.OpenUrl(URI.create(github)))));
-                about.add(Text.literal("Version: ").setStyle(Style.EMPTY.withColor(0xf7e1a7))
-                        .append(Text.literal(container.getMetadata().getVersion().getFriendlyString()).setStyle(Style.EMPTY.withColor(Formatting.WHITE))));
+                about.add(Component.literal(container.getMetadata().getName()).setStyle(Style.EMPTY.withColor(COLOR).withBold(true).withClickEvent(new ClickEvent.OpenUrl(URI.create(github)))));
+                about.add(Component.literal("Version: ").setStyle(Style.EMPTY.withColor(0xf7e1a7))
+                        .append(Component.literal(container.getMetadata().getVersion().getFriendlyString()).setStyle(Style.EMPTY.withColor(ChatFormatting.WHITE))));
 
                 about.add(extraData);
-                about.add(Text.empty());
+                about.add(Component.empty());
 
                 var desc = new ArrayList<>(List.of(container.getMetadata().getDescription().split(" ")));
 
@@ -112,13 +115,13 @@ public class GenericModInfo {
                         (descPart.isEmpty() ? descPart : descPart.append(" ")).append(desc.remove(0));
 
                         if (descPart.length() > 16) {
-                            about.add(Text.literal(descPart.toString()).setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                            about.add(Component.literal(descPart.toString()).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
                             descPart = new StringBuilder();
                         }
                     }
 
                     if (descPart.length() > 0) {
-                        about.add(Text.literal(descPart.toString()).setStyle(Style.EMPTY.withColor(Formatting.GRAY)));
+                        about.add(Component.literal(descPart.toString()).setStyle(Style.EMPTY.withColor(ChatFormatting.GRAY)));
                     }
                 }
 
@@ -137,25 +140,25 @@ public class GenericModInfo {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                var invalid = Text.literal("/!\\ [ Invalid about mod info ] /!\\").setStyle(Style.EMPTY.withColor(0xFF0000).withItalic(true));
+                var invalid = Component.literal("/!\\ [ Invalid about mod info ] /!\\").setStyle(Style.EMPTY.withColor(0xFF0000).withItalic(true));
 
                 output.add(invalid);
                 about.add(invalid);
             }
 
-            GenericModInfo.about = output.toArray(new Text[0]);
+            GenericModInfo.about = output.toArray(new Component[0]);
         }
     }
 
-    public static Text[] getIcon() {
+    public static Component[] getIcon() {
         return icon;
     }
 
-    public static Text[] getAboutFull() {
+    public static Component[] getAboutFull() {
         return about;
     }
 
-    public static Text[] getAboutConsole() {
+    public static Component[] getAboutConsole() {
         return consoleAbout;
     }
 }

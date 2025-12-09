@@ -12,14 +12,14 @@ import net.fabricmc.fabric.api.event.Event;
 import net.fabricmc.fabric.api.event.EventFactory;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.packet.s2c.play.PlayerListHeaderS2CPacket;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardCriterion;
-import net.minecraft.scoreboard.ScoreboardObjective;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundTabListPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -31,9 +31,9 @@ public class PlayerList implements ModInitializer {
 	public static final Scoreboard SCOREBOARD = new Scoreboard();
 	public static final String OBJECTIVE_NAME = "■SPL_OBJ";
 
-	public static final ScoreboardObjective SCOREBOARD_OBJECTIVE = new ScoreboardObjective(
-			SCOREBOARD, OBJECTIVE_NAME, ScoreboardCriterion.DUMMY,
-			Text.empty(), ScoreboardCriterion.RenderType.INTEGER, false, null);
+	public static final Objective SCOREBOARD_OBJECTIVE = new Objective(
+			SCOREBOARD, OBJECTIVE_NAME, ObjectiveCriteria.DUMMY,
+			Component.empty(), ObjectiveCriteria.RenderType.INTEGER, false, null);
 
 
 	@Override
@@ -53,32 +53,32 @@ public class PlayerList implements ModInitializer {
 	private void tick(MinecraftServer server) {
 		if (ConfigManager.isEnabled()) {
 			ConfigData config = ConfigManager.getConfig().configData;
-			for (var player : server.getPlayerManager().getPlayerList()) {
+			for (var player : server.getPlayerList().getPlayers()) {
 				var x = System.nanoTime();
-				if (!SPLHelper.shouldSendPlayerList(player) || player.networkHandler == null) {
+				if (!SPLHelper.shouldSendPlayerList(player) || player.connection == null) {
 					continue;
 				}
-				var tick = server.getTicks();
-				var holder = (PlayerListViewerHolder) player.networkHandler;
+				var tick = server.getTickCount();
+				var holder = (PlayerListViewerHolder) player.connection;
 
 				var style = holder.styledPlayerList$getStyleObject();
 
 				if (tick % style.updateRate == 0) {
 					var context = PlaceholderContext.of(player, SPLHelper.PLAYER_LIST_VIEW);
 					var animationTick = holder.styledPlayerList$getAndIncreaseAnimationTick();
-					player.networkHandler.sendPacket(new PlayerListHeaderS2CPacket(style.getHeader(context, animationTick), style.getFooter(context, animationTick)));
+					player.connection.send(new ClientboundTabListPacket(style.getHeader(context, animationTick), style.getFooter(context, animationTick)));
 				}
 
 				if (config.playerName.playerNameUpdateRate > 0 && tick % config.playerName.playerNameUpdateRate == 0) {
 					holder.styledPlayerList$updateName();
 				}
-				player.sendMessage(Text.literal(tick + " | " + ((System.nanoTime() - x) / 1000000f)), true);
+				player.displayClientMessage(Component.literal(tick + " | " + ((System.nanoTime() - x) / 1000000f)), true);
 			}
 		}
 	}
 
 	public static Identifier id(String path) {
-		return Identifier.of(ID, path);
+		return Identifier.fromNamespaceAndPath(ID, path);
 	}
 
 	public static final Event<PlayerList.PlayerListStyleLoad> PLAYER_LIST_STYLE_LOAD = EventFactory.createArrayBacked(PlayerList.PlayerListStyleLoad.class, (callbacks) -> (styleHelper) -> {
@@ -105,11 +105,11 @@ public class PlayerList implements ModInitializer {
 	}
 
 
-	public static String getPlayersStyle(ServerPlayerEntity player) {
-		return ((PlayerListViewerHolder) player.networkHandler).styledPlayerList$getStyle();
+	public static String getPlayersStyle(ServerPlayer player) {
+		return ((PlayerListViewerHolder) player.connection).styledPlayerList$getStyle();
 	}
 
-	public static void setPlayersStyle(ServerPlayerEntity player, String key) {
+	public static void setPlayersStyle(ServerPlayer player, String key) {
 		((PlayerListViewerHolder) player).styledPlayerList$setStyle(key);
 	}
 
@@ -118,6 +118,6 @@ public class PlayerList implements ModInitializer {
 	}
 
 	public interface ModCompatibility {
-		boolean check(ServerPlayerEntity player);
+		boolean check(ServerPlayer player);
 	}
 }

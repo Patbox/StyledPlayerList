@@ -4,13 +4,13 @@
   "package": "eu.pb4.styledplayerlist.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "PlayerListS2CPacketEntryMixin",
-    "PlayerManagerMixin",
-    "ServerPlayerEntityMixin",
-    "ServerPlayNetworkManagerMixin"
+    "ClientboundPlayerInfoUpdatePacketEntryMixin",
+    "PlayerListMixin",
+    "ServerPlayerMixin",
+    "ServerGamePacketListenerImplMixin"
   ],
   "client": [
-    "client.InGameHudMixin"
+    "client.GuiMixin"
   ],
   "injectors": {
     "defaultRequire": 1

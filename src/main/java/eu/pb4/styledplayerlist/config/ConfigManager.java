@@ -12,9 +12,6 @@ import eu.pb4.styledplayerlist.config.data.StyleData;
 import eu.pb4.styledplayerlist.config.data.legacy.LegacyConfigData;
 import eu.pb4.styledplayerlist.config.data.legacy.LegacyStyleData;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.util.Identifier;
-
-
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Collection;

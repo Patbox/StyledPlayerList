@@ -10,12 +10,11 @@ import eu.pb4.predicate.api.BuiltinPredicates;
 import eu.pb4.predicate.api.MinecraftPredicate;
 import eu.pb4.predicate.api.PredicateContext;
 import eu.pb4.styledplayerlist.config.data.StyleData;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.Text;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 
 public class PlayerListStyle {
     public final String id;
@@ -40,19 +39,19 @@ public class PlayerListStyle {
         this.require = data.require != null ? data.require : BuiltinPredicates.operatorLevel(0);
     }
 
-    public boolean hasPermission(ServerPlayerEntity player) {
+    public boolean hasPermission(ServerPlayer player) {
         return this.require.test(PredicateContext.of(player)).success();
     }
 
-    public boolean hasPermission(ServerCommandSource source) {
+    public boolean hasPermission(CommandSourceStack source) {
         return this.require.test(PredicateContext.of(source)).success();
     }
 
-    public Text getHeader(PlaceholderContext context, int tick) {
+    public Component getHeader(PlaceholderContext context, int tick) {
         return this.header.getFor(tick).toText(context);
     }
 
-    public Text getFooter(PlaceholderContext context, int tick) {
+    public Component getFooter(PlaceholderContext context, int tick) {
         return this.footer.getFor(tick).toText(context);
     }
 

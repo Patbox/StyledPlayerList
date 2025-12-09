@@ -3,18 +3,17 @@ package eu.pb4.styledplayerlist;
 import carpet.logging.HUDController;
 import eu.pb4.placeholders.api.PlaceholderContext;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 import java.util.HashSet;
 import java.util.Set;
 
 public class SPLHelper {
-    public static final PlaceholderContext.ViewObject PLAYER_LIST_VIEW = PlaceholderContext.ViewObject.of(Identifier.of("styled_player_list", "player_list"));
-    public static final PlaceholderContext.ViewObject PLAYER_NAME_VIEW = PlaceholderContext.ViewObject.of(Identifier.of("styled_player_list", "player_name"));
+    public static final PlaceholderContext.ViewObject PLAYER_LIST_VIEW = PlaceholderContext.ViewObject.of(Identifier.fromNamespaceAndPath("styled_player_list", "player_list"));
+    public static final PlaceholderContext.ViewObject PLAYER_NAME_VIEW = PlaceholderContext.ViewObject.of(Identifier.fromNamespaceAndPath("styled_player_list", "player_name"));
     public static Set<PlayerList.ModCompatibility> COMPATIBILITY = new HashSet<>();
 
-    private static final Set<ServerPlayerEntity> BLOCKED_LAST_TIME = new HashSet<>();
+    private static final Set<ServerPlayer> BLOCKED_LAST_TIME = new HashSet<>();
 
     static {
         FabricLoader loader = FabricLoader.getInstance();
@@ -34,7 +33,7 @@ public class SPLHelper {
         }
     }
 
-    public static boolean shouldSendPlayerList(ServerPlayerEntity player) {
+    public static boolean shouldSendPlayerList(ServerPlayer player) {
         for (PlayerList.ModCompatibility mod : COMPATIBILITY) {
             boolean value = mod.check(player);
 
