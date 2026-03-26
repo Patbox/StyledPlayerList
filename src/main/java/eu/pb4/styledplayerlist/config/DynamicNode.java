@@ -10,10 +10,11 @@ public record DynamicNode(String key, Component text) implements TextNode {
         return new DynamicNode(key, Component.literal("${" + key + "}"));
     }
 
-    public static final ParserContext.Key<Map<String, Component>> NODES = new ParserContext.Key<>("styled_player_list:dynamic", null);
+    public static final ParserContext.Key<Map<String, Component>> NODES = new ParserContext.Key<>(
+            "styled_player_list:dynamic", null, false);
 
     @Override
-    public Component toText(ParserContext context, boolean removeBackslashes) {
+    public Component toComponent(ParserContext context, boolean removeBackslashes) {
         return context.get(NODES).getOrDefault(this.key, text);
     }
 

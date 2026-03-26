@@ -1,6 +1,5 @@
 package eu.pb4.styledplayerlist.config;
 
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import eu.pb4.predicate.api.GsonPredicateSerializer;
@@ -9,9 +8,9 @@ import eu.pb4.styledplayerlist.PlayerList;
 
 import eu.pb4.styledplayerlist.config.data.ConfigData;
 import eu.pb4.styledplayerlist.config.data.StyleData;
-import eu.pb4.styledplayerlist.config.data.legacy.LegacyConfigData;
-import eu.pb4.styledplayerlist.config.data.legacy.LegacyStyleData;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.HolderLookup;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Collection;
@@ -19,11 +18,6 @@ import java.util.LinkedHashMap;
 
 
 public class ConfigManager {
-    public static final Gson GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().setLenient()
-            .registerTypeHierarchyAdapter(MinecraftPredicate.class, GsonPredicateSerializer.INSTANCE)
-            .registerTypeAdapter(StyleData.ElementList.class, new StyleData.ElementList.Serializer())
-            .create();
-
     private static Config CONFIG;
     private static boolean ENABLED = false;
     private static final LinkedHashMap<String, PlayerListStyle> STYLES = new LinkedHashMap<>();
@@ -37,10 +31,16 @@ public class ConfigManager {
         return ENABLED;
     }
 
-    public static boolean loadConfig() {
+    public static boolean loadConfig(HolderLookup.Provider lookup) {
         ENABLED = false;
 
         CONFIG = null;
+
+        var GSON = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().setLenient()
+                .registerTypeHierarchyAdapter(MinecraftPredicate.class, GsonPredicateSerializer.create(lookup))
+                .registerTypeAdapter(StyleData.ElementList.class, new StyleData.ElementList.Serializer())
+                .create();
+
         try {
             var configDir =  FabricLoader.getInstance().getConfigDir().resolve("styledplayerlist");
 
@@ -61,14 +61,13 @@ public class ConfigManager {
             ConfigData config;
 
             var configFile = configDir.resolve("config.json");
-            LegacyConfigData legacyConfigData = null;
             if (Files.exists(configFile)) {
                 var data = JsonParser.parseString(Files.readString(configFile));
 
                 if (data.getAsJsonObject().has("CONFIG_VERSION_DONT_TOUCH_THIS")) {
-                    legacyConfigData = GSON.fromJson(data, LegacyConfigData.class);
+                    PlayerList.LOGGER.warn("Outdated Styled Player List config detected!");
                     Files.writeString(configDir.resolve("config.json_old"), data.toString());
-                    config = legacyConfigData.convert();
+                    config = GSON.fromJson(data, ConfigData.class);
                 } else {
                     config = GSON.fromJson(data, ConfigData.class);
                 }
@@ -81,7 +80,6 @@ public class ConfigManager {
 
             STYLES.clear();
 
-            var finalLegacyConfigData = legacyConfigData;
             Files.list(configStyle).filter((name) -> !name.endsWith(".json")).forEach((path) -> {
                 String data;
                 try {
@@ -96,7 +94,8 @@ public class ConfigManager {
                 StyleData styleData;
 
                 if (json.getAsJsonObject().has("permission")) {
-                    styleData = GSON.fromJson(data, LegacyStyleData.class).convert(finalLegacyConfigData);
+                    styleData = GSON.fromJson(data, StyleData.class);
+                    PlayerList.LOGGER.warn("Outdated Styled Player List style detected! {}", path);
 
                     try {
                         Files.createDirectories(configStyleLegacy);

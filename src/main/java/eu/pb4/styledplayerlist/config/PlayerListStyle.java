@@ -1,11 +1,8 @@
 package eu.pb4.styledplayerlist.config;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
-import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import eu.pb4.placeholders.api.node.TextNode;
-import eu.pb4.placeholders.api.parsers.NodeParser;
-import eu.pb4.placeholders.api.parsers.StaticPreParser;
-import eu.pb4.placeholders.api.parsers.TextParserV1;
 import eu.pb4.predicate.api.BuiltinPredicates;
 import eu.pb4.predicate.api.MinecraftPredicate;
 import eu.pb4.predicate.api.PredicateContext;
@@ -15,6 +12,7 @@ import java.util.List;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.PermissionLevel;
 
 public class PlayerListStyle {
     public final String id;
@@ -36,7 +34,7 @@ public class PlayerListStyle {
         this.header = AnimatedText.from(data.header, data.legacyJoinBehaviour == Boolean.TRUE);
         this.footer = AnimatedText.from(data.footer, data.legacyJoinBehaviour == Boolean.TRUE);
         this.hidden = data.hidden;
-        this.require = data.require != null ? data.require : BuiltinPredicates.operatorLevel(0);
+        this.require = data.require != null ? data.require : BuiltinPredicates.operatorLevel(PermissionLevel.ALL);
     }
 
     public boolean hasPermission(ServerPlayer player) {
@@ -47,12 +45,12 @@ public class PlayerListStyle {
         return this.require.test(PredicateContext.of(source)).success();
     }
 
-    public Component getHeader(PlaceholderContext context, int tick) {
-        return this.header.getFor(tick).toText(context);
+    public Component getHeader(ServerPlaceholderContext context, int tick) {
+        return this.header.getFor(tick).toComponent(context);
     }
 
-    public Component getFooter(PlaceholderContext context, int tick) {
-        return this.footer.getFor(tick).toText(context);
+    public Component getFooter(ServerPlaceholderContext context, int tick) {
+        return this.footer.getFor(tick).toComponent(context);
     }
 
     public interface AnimatedText {

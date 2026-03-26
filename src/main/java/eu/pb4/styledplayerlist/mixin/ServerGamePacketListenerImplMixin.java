@@ -1,6 +1,7 @@
 package eu.pb4.styledplayerlist.mixin;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import eu.pb4.playerdata.api.PlayerDataApi;
 import eu.pb4.styledplayerlist.PlayerList;
 import eu.pb4.styledplayerlist.SPLHelper;
@@ -79,7 +80,7 @@ public abstract class ServerGamePacketListenerImplMixin extends ServerCommonPack
             ConfigData config = ConfigManager.getConfig().configData;
 
             if (tick % this.styledPlayerList$style.updateRate == 0) {
-                var context = PlaceholderContext.of(this.player, SPLHelper.PLAYER_LIST_VIEW);
+                var context = ServerPlaceholderContext.of(this.player, SPLHelper.PLAYER_LIST_VIEW);
                 this.send(new ClientboundTabListPacket(this.styledPlayerList$style.getHeader(context, this.styledPlayerList$animationTick), this.styledPlayerList$style.getFooter(context, this.styledPlayerList$animationTick)));
                 this.styledPlayerList$animationTick += 1;
             }

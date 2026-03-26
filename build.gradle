@@ -1,5 +1,5 @@
 plugins {
-	id 'fabric-loom' version '1.13.+'
+	id 'net.fabricmc.fabric-loom' version '1.15.+'
 	id 'maven-publish'
 	id "com.modrinth.minotaur" version "2.+"
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
@@ -16,28 +16,26 @@ repositories {
 
 var isStable = project.is_stable == "true"
 
-sourceCompatibility = JavaVersion.VERSION_21
-targetCompatibility = JavaVersion.VERSION_21
-
-archivesBaseName = project.archives_base_name
+base {
+	archivesName = project.archives_base_name
+}
 version = project.mod_version
 group = project.maven_group
 
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
-	mappings loom.officialMojangMappings()
-	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+	implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	modCompileOnly("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
-	modLocalRuntime("net.fabricmc.fabric-api:fabric-api:${project.fabric_version}")
+	compileOnly("net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}")
+	localRuntime("net.fabricmc.fabric-api:fabric-api:${project.fabric_api_version}")
 
-	modImplementation include("eu.pb4:predicate-api:0.7.0+1.21.11")
-	modImplementation include("eu.pb4:placeholder-api:2.8.1+1.21.10")
-	modImplementation include("me.lucko:fabric-permissions-api:0.6.0-patbox")
-	modImplementation include("eu.pb4:player-data-api:0.9.0+1.21.9")
+	implementation include("eu.pb4:predicate-api:0.8.1+26.1")
+	implementation include("eu.pb4:placeholder-api:3.0.0-beta.2+26.1")
+	implementation include("eu.pb4:player-data-api:0.10.0+26.1")
+	implementation "me.lucko:fabric-permissions-api:0.7.0"
 
-	modCompileOnly "carpet:fabric-carpet:${project.carpet_core_version}"
+	compileOnly "carpet:fabric-carpet:${project.carpet_core_version}"
 
 
 	// PSA: Some older mods, compiled on Loom 0.2.1, might have outdated Maven POMs.
@@ -62,7 +60,7 @@ tasks.withType(JavaCompile).configureEach {
 	// The Minecraft launcher currently installs Java 8 for users, so your mod probably wants to target Java 8 too
 	// JDK 9 introduced a new way of specifying this that will make sure no newer classes or methods are used.
 	// We'll use that if it's available, but otherwise we'll use the older option.
-	it.options.release = 21
+	it.options.release = 25
 }
 
 java {
@@ -74,7 +72,7 @@ java {
 
 jar {
 	from("LICENSE") {
-		rename { "${it}_${project.archivesBaseName}"}
+		rename { "${it}_${project.archives_base_name}"}
 	}
 }
 
@@ -83,11 +81,11 @@ publishing {
 	publications {
 		mavenJava(MavenPublication) {
 			// add all the jars that should be included when publishing to maven
-			artifact(remapJar) {
-				builtBy remapJar
+			artifact(jar) {
+				builtBy jar
 			}
 			artifact(sourcesJar) {
-				builtBy remapSourcesJar
+				builtBy sourcesJar
 			}
 		}
 	}
@@ -110,11 +108,10 @@ curseforge {
 			changelogType = "markdown"
 			addGameVersion((project.minecraft_version.contains("-") ? ((String) project.minecraft_version.split("-")[0] + "-snapshot") : project.minecraft_version))
 			addGameVersion "Fabric"
-			addGameVersion "Quilt"
-			mainArtifact(remapJar)
+			mainArtifact(jar.archiveFile)
 
 			afterEvaluate {
-				uploadTask.dependsOn("remapJar")
+				uploadTask.dependsOn("jar")
 			}
 		}
 	}
@@ -122,7 +119,7 @@ curseforge {
 	options {
 		forgeGradleIntegration = false
 	}
-	remapJar {
+	jar {
 		finalizedBy project.tasks.curseforge
 	}
 }
@@ -133,13 +130,13 @@ if (System.getenv("MODRINTH")) {
 		projectId = 'DQIfKUHf'// The ID of your modrinth project, slugs will not work.
 		versionNumber = "" + version // The version of the mod to upload.
 		versionType = isStable ? "release" : "beta"
-		uploadFile = remapJar // This links to a task that builds your mod jar and sets "uploadFile" to the mod jar.
+		uploadFile = jar // This links to a task that builds your mod jar and sets "uploadFile" to the mod jar.
 		gameVersions = [((String) project.minecraft_version)]
 		changelog = System.getenv("CHANGELOG")
-		loaders = ["fabric", "quilt"]
+		loaders = ["fabric"]
 	}
 
-	remapJar {
+	jar {
 		finalizedBy project.tasks.modrinth
 	}
 }

@@ -1,6 +1,7 @@
 package eu.pb4.styledplayerlist.mixin;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import eu.pb4.styledplayerlist.PlayerList;
 import eu.pb4.styledplayerlist.SPLHelper;
 import eu.pb4.styledplayerlist.access.PlayerListViewerHolder;
@@ -33,7 +34,7 @@ public abstract class PlayerListMixin {
         ));
         this.broadcastAll(packet);
         handler.send(packet);
-        var context = PlaceholderContext.of(player, SPLHelper.PLAYER_LIST_VIEW);
+        var context = ServerPlaceholderContext.of(player, SPLHelper.PLAYER_LIST_VIEW);
         var x = ((PlayerListViewerHolder) handler).styledPlayerList$getAndIncreaseAnimationTick();
         var style = ((PlayerListViewerHolder) handler).styledPlayerList$getStyleObject();
         handler.send(new ClientboundTabListPacket(style.getHeader(context, x), style.getFooter(context, x)));

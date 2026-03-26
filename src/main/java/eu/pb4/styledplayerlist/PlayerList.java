@@ -2,6 +2,7 @@ package eu.pb4.styledplayerlist;
 
 import eu.pb4.placeholders.api.PlaceholderContext;
 import eu.pb4.placeholders.api.Placeholders;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import eu.pb4.styledplayerlist.access.PlayerListViewerHolder;
 import eu.pb4.styledplayerlist.command.Commands;
 import eu.pb4.styledplayerlist.config.ConfigManager;
@@ -41,13 +42,13 @@ public class PlayerList implements ModInitializer {
 		GenericModInfo.build(FabricLoader.getInstance().getModContainer(ID).get());
 		Commands.register();
 		ServerLifecycleEvents.SERVER_STARTED.register(s -> {
-			ConfigManager.loadConfig();
+			ConfigManager.loadConfig(s.registryAccess());
 
 			CardboardWarning.checkAndAnnounce();
 			//MicroScheduler.get(s).scheduleRepeating(50, () -> tick(s));
 		});
 
-		Placeholders.registerChangeEvent((a, b) -> ConfigManager.rebuildStyled());
+		Placeholders.registerServerChangeEvent((a, b) -> ConfigManager.rebuildStyled());
 	}
 
 	private void tick(MinecraftServer server) {
@@ -64,7 +65,7 @@ public class PlayerList implements ModInitializer {
 				var style = holder.styledPlayerList$getStyleObject();
 
 				if (tick % style.updateRate == 0) {
-					var context = PlaceholderContext.of(player, SPLHelper.PLAYER_LIST_VIEW);
+					var context = ServerPlaceholderContext.of(player, SPLHelper.PLAYER_LIST_VIEW);
 					var animationTick = holder.styledPlayerList$getAndIncreaseAnimationTick();
 					player.connection.send(new ClientboundTabListPacket(style.getHeader(context, animationTick), style.getFooter(context, animationTick)));
 				}
@@ -72,7 +73,7 @@ public class PlayerList implements ModInitializer {
 				if (config.playerName.playerNameUpdateRate > 0 && tick % config.playerName.playerNameUpdateRate == 0) {
 					holder.styledPlayerList$updateName();
 				}
-				player.displayClientMessage(Component.literal(tick + " | " + ((System.nanoTime() - x) / 1000000f)), true);
+				player.sendSystemMessage(Component.literal(tick + " | " + ((System.nanoTime() - x) / 1000000f)), true);
 			}
 		}
 	}

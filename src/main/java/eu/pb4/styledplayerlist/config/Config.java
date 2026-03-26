@@ -2,6 +2,7 @@ package eu.pb4.styledplayerlist.config;
 
 import eu.pb4.placeholders.api.ParserContext;
 import eu.pb4.placeholders.api.PlaceholderContext;
+import eu.pb4.placeholders.api.ServerPlaceholderContext;
 import eu.pb4.placeholders.api.node.TextNode;
 import eu.pb4.placeholders.api.parsers.NodeParser;
 import eu.pb4.predicate.api.BuiltinPredicates;
@@ -9,6 +10,7 @@ import eu.pb4.predicate.api.MinecraftPredicate;
 import eu.pb4.predicate.api.PredicateContext;
 import eu.pb4.styledplayerlist.SPLHelper;
 import eu.pb4.styledplayerlist.config.data.ConfigData;
+import net.minecraft.server.permissions.PermissionLevel;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -21,7 +23,7 @@ public class Config {
     public static final NodeParser PARSER = NodeParser.builder()
             .simplifiedTextFormat()
             .quickText()
-            .globalPlaceholders()
+            .serverPlaceholders()
             .staticPreParsing()
             .build();
 
@@ -42,15 +44,15 @@ public class Config {
         this.playerNameFormat = parseText(data.playerName.playerNameFormat);
         this.rightFormat = parseText(data.playerName.rightTextFormat);
         this.switchMessage = parseText(data.messages.switchMessage);
-        this.unknownStyleMessage = parseText(data.messages.unknownStyleMessage).toText();
-        this.permissionMessage = parseText(data.messages.permissionMessage).toText();
+        this.unknownStyleMessage = parseText(data.messages.unknownStyleMessage).toComponent();
+        this.permissionMessage = parseText(data.messages.permissionMessage).toComponent();
         this.isHiddenDefault = data.playerName.hidePlayer;
         this.passthroughDefault = data.playerName.ignoreFormatting;
 
         this.permissionNameFormat = new ArrayList<>();
 
         for (ConfigData.PermissionNameFormat entry : data.playerName.permissionNameFormat) {
-            this.permissionNameFormat.add(new PermissionNameFormat(entry.require != null ? entry.require : BuiltinPredicates.operatorLevel(5),
+            this.permissionNameFormat.add(new PermissionNameFormat(entry.require != null ? entry.require : BuiltinPredicates.alwaysFalse(),
                     parseText(entry.format), parseText(entry.rightTextFormat), entry.index, entry.ignoreFormatting, entry.hidePlayer != null ? entry.hidePlayer : isHiddenDefault));
         }
     }
@@ -64,7 +66,7 @@ public class Config {
     }
 
     public Component getSwitchMessage(ServerPlayer player, String target) {
-        return this.switchMessage.toText(ParserContext.of(DynamicNode.NODES, Map.of("name", Component.literal(target))));
+        return this.switchMessage.toComponent(ParserContext.of(DynamicNode.NODES, Map.of("name", Component.literal(target))));
     }
 
     @Nullable
@@ -72,22 +74,22 @@ public class Config {
         var context = PredicateContext.of(player);
         for (PermissionNameFormat entry : this.permissionNameFormat) {
             if (entry.name != null && entry.predicate.test(context).success()) {
-                return entry.passthrough ? null : entry.name.toText(PlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
+                return entry.passthrough ? null : entry.name.toComponent(ServerPlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
             }
         }
 
-        return this.passthroughDefault ? null : this.playerNameFormat.toText(PlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
+        return this.passthroughDefault ? null : this.playerNameFormat.toComponent(ServerPlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
     }
 
     public Component formatPlayerRightText(ServerPlayer player) {
         var context = PredicateContext.of(player);
         for (PermissionNameFormat entry : this.permissionNameFormat) {
             if (entry.right != null && entry.predicate.test(context).success()) {
-                return entry.right.toText(PlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
+                return entry.right.toComponent(ServerPlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
             }
         }
 
-        return this.rightFormat.toText(PlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
+        return this.rightFormat.toComponent(ServerPlaceholderContext.of(player, SPLHelper.PLAYER_NAME_VIEW));
     }
 
     public boolean isPlayerHidden(ServerPlayer player) {

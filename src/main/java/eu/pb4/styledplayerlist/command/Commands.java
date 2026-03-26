@@ -5,20 +5,23 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.builder.RequiredArgumentBuilder;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import eu.pb4.styledplayerlist.FabricPermissionBridge;
 import eu.pb4.styledplayerlist.GenericModInfo;
 import eu.pb4.styledplayerlist.access.PlayerListViewerHolder;
 import eu.pb4.styledplayerlist.config.ConfigManager;
 import eu.pb4.styledplayerlist.config.PlayerListStyle;
-import me.lucko.fabric.api.permissions.v0.Permissions;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.PermissionLevel;
+
 import java.util.Collection;
 import java.util.Locale;
 
+import static eu.pb4.styledplayerlist.PlayerList.id;
 import static net.minecraft.commands.Commands.literal;
 
 public class Commands {
@@ -26,17 +29,17 @@ public class Commands {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
             dispatcher.register(
                     literal("styledplayerlist")
-                            .requires(Permissions.require("styledplayerlist.main", true))
+                            .requires(FabricPermissionBridge.require(id("main"), true))
                             .executes(Commands::about)
                             .then(literal("switch")
-                                    .requires(Permissions.require("styledplayerlist.switch", true))
+                                    .requires(FabricPermissionBridge.require(id("switch"), true))
                                     .then(switchArgument("style")
                                             .executes(Commands::switchStyle)
                                     )
                             )
 
                             .then(literal("switchothers")
-                                    .requires(Permissions.require("styledplayerlist.switch.others", 2))
+                                    .requires(FabricPermissionBridge.require(id("switch.others"), PermissionLevel.GAMEMASTERS))
                                     .then(net.minecraft.commands.Commands.argument("targets", EntityArgument.players())
                                             .then(switchArgument("style")
                                                     .executes(Commands::switchStyleOthers)
@@ -45,14 +48,14 @@ public class Commands {
                             )
 
                             .then(literal("reload")
-                                    .requires(Permissions.require("styledplayerlist.reload", 3))
+                                    .requires(FabricPermissionBridge.require(id("reload"), PermissionLevel.ADMINS))
                                     .executes(Commands::reloadConfig)
                             )
             );
 
             dispatcher.register(
                     literal("plstyle")
-                            .requires(Permissions.require("styledplayerlist.switch", true))
+                            .requires(FabricPermissionBridge.require(id("switch"), true))
                             .then(switchArgument("style")
                                     .executes(Commands::switchStyle)
                             )
@@ -62,7 +65,7 @@ public class Commands {
     }
 
     private static int reloadConfig(CommandContext<CommandSourceStack> context) {
-        if (ConfigManager.loadConfig()) {
+        if (ConfigManager.loadConfig(context.getSource().registryAccess())) {
             context.getSource().sendSuccess(() -> Component.literal("Reloaded config!"), false);
         } else {
             context.getSource().sendFailure(Component.literal("Error accrued while reloading config!").withStyle(ChatFormatting.RED));
