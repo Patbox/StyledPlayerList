@@ -10,7 +10,7 @@
     "ServerGamePacketListenerImplMixin"
   ],
   "client": [
-    "client.GuiMixin"
+    "client.HudMixin"
   ],
   "injectors": {
     "defaultRequire": 1
