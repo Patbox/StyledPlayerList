@@ -106,7 +106,7 @@ publishMods {
 
 	if (System.getenv("CURSEFORGE")) {
 		curseforge {
-			projectId = "DQIfKUHf"
+			projectId = "442282"
 			accessToken = System.getenv("CURSEFORGE")
 			client = true
 			server = true
@@ -123,7 +123,7 @@ publishMods {
 	if (System.getenv("MODRINTH")) {
 		modrinth {
 			accessToken = System.getenv("MODRINTH")
-			projectId = 'yn9u3ypm'
+			projectId = 'DQIfKUHf'
 
 			minecraftVersions.add(project.minecraft_version);
 			for (String a : project.mc_extra_supported.split(",")) {
